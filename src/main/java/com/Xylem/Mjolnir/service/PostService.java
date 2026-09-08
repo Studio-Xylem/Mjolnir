@@ -10,8 +10,8 @@ import com.Xylem.Mjolnir.repository.PostRepository;
 import com.Xylem.Mjolnir.repository.ResolutionResult;
 import com.Xylem.Mjolnir.security.AuthenticatedUser;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class PostService {
@@ -28,72 +28,38 @@ public class PostService {
         Post post = new Post(user.uid(), request.title().trim(), request.description().trim(),
                 request.category().trim(), request.type(), request.location().trim());
         post.setPictureUrl(request.pictureUrl() == null ? "" : request.pictureUrl().trim());
-        try {
-            postRepository.save(post);
-            return post;
-        } catch (InterruptedException exception) {
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException("Interrupted while accessing Firestore", exception);
-        } catch (ExecutionException exception) {
-            throw new IllegalStateException("Unable to access Firestore", exception);
-        }
+        postRepository.save(post);
+        return post;
     }
 
     public Post getById(String id) {
-        try {
-            Post post = postRepository.findById(id);
-            if (post == null) {
-                throw new NotFoundException("Post not found");
-            }
-            return post;
-        } catch (InterruptedException exception) {
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException("Interrupted while accessing Firestore", exception);
-        } catch (ExecutionException exception) {
-            throw new IllegalStateException("Unable to access Firestore", exception);
+        Post post = postRepository.findById(id).orElse(null);
+        if (post == null) {
+            throw new NotFoundException("Post not found");
         }
+        return post;
     }
 
     public List<Post> getActive(PostType type) {
-        try {
-            return type == null ? postRepository.findAllActive() : postRepository.findByType(type);
-        } catch (InterruptedException exception) {
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException("Interrupted while accessing Firestore", exception);
-        } catch (ExecutionException exception) {
-            throw new IllegalStateException("Unable to access Firestore", exception);
-        }
+        return type == null ? postRepository.findAllActive() : postRepository.findByType(type);
     }
 
     public List<Post> getMine(AuthenticatedUser user) {
-        try {
-            return postRepository.findByUserId(user.uid());
-        } catch (InterruptedException exception) {
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException("Interrupted while accessing Firestore", exception);
-        } catch (ExecutionException exception) {
-            throw new IllegalStateException("Unable to access Firestore", exception);
-        }
+        return postRepository.findByUserId(user.uid());
     }
 
+    @Transactional
     public void resolve(AuthenticatedUser user, String id) {
         Post post = getById(id);
         if (!post.getUserId().equals(user.uid())) {
             throw new ForbiddenException("Only the post owner can resolve this post");
         }
-        try {
-            ResolutionResult result = postRepository.resolveIfActive(id);
-            if (result == ResolutionResult.NOT_FOUND) {
-                throw new NotFoundException("Post not found");
-            }
-            if (result == ResolutionResult.ALREADY_RESOLVED) {
-                throw new ConflictException("A resolved post cannot be resolved again");
-            }
-        } catch (InterruptedException exception) {
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException("Interrupted while accessing Firestore", exception);
-        } catch (ExecutionException exception) {
-            throw new IllegalStateException("Unable to access Firestore", exception);
+        ResolutionResult result = postRepository.resolveIfActive(id);
+        if (result == ResolutionResult.NOT_FOUND) {
+            throw new NotFoundException("Post not found");
+        }
+        if (result == ResolutionResult.ALREADY_RESOLVED) {
+            throw new ConflictException("A resolved post cannot be resolved again");
         }
     }
 }

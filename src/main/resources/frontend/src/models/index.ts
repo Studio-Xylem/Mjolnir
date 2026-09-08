@@ -11,7 +11,7 @@ export enum PostStatus {
 export interface User {
   id: string;
   username: string;
-  createdAt: Timestamp;
+  createdAt: string;
 }
 
 export interface Post {
@@ -25,11 +25,10 @@ export interface Post {
   status: PostStatus;
   location: string;
   currentCustody: string;
-  createdAt: Timestamp;
+  createdAt: string;
 }
 
 export interface CreatePostDTO {
-  userId: string;
   title: string;
   description: string;
   category: string;
@@ -48,4 +47,3 @@ export interface UpdatePostDTO {
   location?: string;
   currentCustody?: string;
 }
-import type { Timestamp } from 'firebase/firestore';

@@ -1,32 +1,20 @@
-import { 
-  getStorage, 
-  ref, 
-  uploadBytes, 
-  getDownloadURL, 
-  deleteObject 
-} from 'firebase/storage';
-import { v4 as uuidv4 } from 'uuid';
-
-const storage = getStorage();
+import { API_BASE_URL } from './api';
+import { auth } from './firebase';
 
 export const storageService = {
-  async uploadImage(file: File, folder: string = 'posts'): Promise<string> {
-    const fileExtension = file.name.split('.').pop();
-    const fileName = `${uuidv4()}.${fileExtension}`;
-    const filePath = `${folder}/${fileName}`;
-    const storageRef = ref(storage, filePath);
-    
-    const snapshot = await uploadBytes(storageRef, file);
-    const downloadURL = await getDownloadURL(snapshot.ref);
-    return downloadURL;
+  async uploadImage(file: File): Promise<string> {
+    const form = new FormData();
+    form.append('file', file);
+    const headers: Record<string, string> = {};
+    if (import.meta.env.VITE_LOCAL_USER_ID) headers['X-User-Id'] = import.meta.env.VITE_LOCAL_USER_ID;
+    if (auth?.currentUser) headers.Authorization = `Bearer ${await auth.currentUser.getIdToken()}`;
+    const response = await fetch(`${API_BASE_URL}/api/uploads`, { method: 'POST', body: form, headers });
+    if (!response.ok) throw new Error((await response.text()) || 'Upload failed');
+    const result = await response.json() as { url: string };
+    return `${API_BASE_URL}${result.url}`;
   },
 
-  async deleteImage(url: string): Promise<void> {
-    try {
-      const storageRef = ref(storage, url);
-      await deleteObject(storageRef);
-    } catch (error) {
-      console.error('Error deleting image:', error);
-    }
+  async deleteImage(_url: string): Promise<void> {
+    // Local files are retained until an authenticated delete endpoint is added.
   },
 };

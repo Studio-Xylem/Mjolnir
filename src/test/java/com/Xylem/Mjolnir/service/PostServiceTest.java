@@ -19,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 class PostServiceTest {
@@ -48,7 +49,7 @@ class PostServiceTest {
         PostService service = new PostService(postRepository, userService);
         Post post = new Post("owner-id", "Wallet", "Black", "Personal", PostType.LOST, "Library");
         post.setId("post-id");
-        when(postRepository.findById("post-id")).thenReturn(post);
+        when(postRepository.findById("post-id")).thenReturn(Optional.of(post));
         when(postRepository.resolveIfActive("post-id")).thenReturn(ResolutionResult.RESOLVED);
 
         service.resolve(owner, "post-id");
@@ -60,7 +61,7 @@ class PostServiceTest {
     void resolveRejectsASecondResolution() throws Exception {
         PostService service = new PostService(postRepository, userService);
         Post post = new Post("owner-id", "Wallet", "Black", "Personal", PostType.LOST, "Library");
-        when(postRepository.findById("post-id")).thenReturn(post);
+        when(postRepository.findById("post-id")).thenReturn(Optional.of(post));
         when(postRepository.resolveIfActive("post-id")).thenReturn(ResolutionResult.ALREADY_RESOLVED);
 
         assertThrows(ConflictException.class, () -> service.resolve(owner, "post-id"));
@@ -70,7 +71,7 @@ class PostServiceTest {
     void resolveRejectsANonOwner() throws Exception {
         PostService service = new PostService(postRepository, userService);
         Post post = new Post("owner-id", "Wallet", "Black", "Personal", PostType.LOST, "Library");
-        when(postRepository.findById("post-id")).thenReturn(post);
+        when(postRepository.findById("post-id")).thenReturn(Optional.of(post));
 
         assertThrows(ForbiddenException.class,
                 () -> service.resolve(new AuthenticatedUser("another-user", "other@example.com", "Other"), "post-id"));

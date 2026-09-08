@@ -11,6 +11,6 @@ public record PostResponse(String id, String userId, String title, String descri
         return new PostResponse(post.getId(), post.getUserId(), post.getTitle(), post.getDescription(),
                 post.getPictureUrl(), post.getCategory(), post.getType(), post.getStatus(), post.getLocation(),
                 post.getCurrentCustody(),
-                post.getCreatedAt() == null ? null : post.getCreatedAt().toDate().toInstant().toString());
+                post.getCreatedAt() == null ? null : post.getCreatedAt().toString());
     }
 }

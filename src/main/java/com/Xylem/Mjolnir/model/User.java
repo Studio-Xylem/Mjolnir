@@ -1,43 +1,30 @@
 package com.Xylem.Mjolnir.model;
 
-import com.google.cloud.firestore.annotation.DocumentId;
-import com.google.cloud.firestore.annotation.ServerTimestamp;
-import com.google.cloud.Timestamp;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import java.time.Instant;
 
+@Entity
+@Table(name = "users")
 public class User {
-    @DocumentId
+    @Id
     private String id;
     private String username;
-    @ServerTimestamp
-    private Timestamp createdAt;
+    private Instant createdAt;
 
-    public User() {}
+    protected User() {
+    }
 
     public User(String username) {
         this.username = username;
+        this.createdAt = Instant.now();
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
-    }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
+    public Instant getCreatedAt() { return createdAt; }
+    public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
 }
