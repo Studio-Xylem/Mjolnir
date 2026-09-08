@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&display=swap');
+
+/* Font Families */
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-body {
+  font-family: var(--font-body);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Type Scale Utilities */
+.text-xs { font-size: var(--text-xs); line-height: var(--leading-normal); }
+.text-sm { font-size: var(--text-sm); line-height: var(--leading-normal); }
+.text-base { font-size: var(--text-base); line-height: var(--leading-normal); }
+.text-md { font-size: var(--text-md); line-height: var(--leading-normal); }
+.text-lg { font-size: var(--text-lg); line-height: var(--leading-tight); }
+.text-xl { font-size: var(--text-xl); line-height: var(--leading-tight); }
+.text-2xl { font-size: var(--text-2xl); line-height: var(--leading-tight); }
+.text-3xl { font-size: var(--text-3xl); line-height: var(--leading-tight); }
+
+/* Font Weights */
+.font-normal { font-weight: var(--weight-normal); }
+.font-medium { font-weight: var(--weight-medium); }
+.font-semibold { font-weight: var(--weight-semibold); }
+.font-bold { font-weight: var(--weight-bold); }
+
+/* Heading Hierarchy */
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+  font-family: var(--font-display);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+h1, .h1 {
+  font-size: var(--text-3xl);
+  letter-spacing: -0.02em;
+}
+
+h2, .h2 {
+  font-size: var(--text-2xl);
+  letter-spacing: -0.01em;
+}
+
+h3, .h3 {
+  font-size: var(--text-xl);
+}
+
+h4, .h4 {
+  font-size: var(--text-lg);
+}
+
+h5, .h5 {
+  font-size: var(--text-md);
+}
+
+h6, .h6 {
+  font-size: var(--text-base);
+}
+
+/* Text Colors */
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+.text-inverse { color: var(--text-inverse); }
+
+/* Alignment */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }

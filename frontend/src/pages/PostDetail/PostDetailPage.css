@@ -1,0 +1,239 @@
+.post-detail-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 32px 16px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 24px;
+}
+
+.back-link:hover {
+  color: var(--color-text-main);
+}
+
+.post-detail-content {
+  background: var(--color-background-paper);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.post-image-container {
+  width: 100%;
+  height: 300px;
+  background-color: var(--color-background-stone);
+  cursor: pointer;
+}
+
+@media (min-width: 768px) {
+  .post-image-container {
+    height: 500px;
+  }
+}
+
+.post-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.post-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.lost-bg {
+  background-color: var(--color-lost);
+}
+
+.found-bg {
+  background-color: var(--color-found);
+}
+
+.post-info {
+  padding: 24px;
+}
+
+@media (min-width: 768px) {
+  .post-info {
+    padding: 40px;
+  }
+}
+
+.post-header {
+  margin-bottom: 32px;
+}
+
+.post-badges {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.type-badge {
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.type-badge.lost {
+  background: rgba(184, 92, 56, 0.1);
+  color: var(--color-lost);
+  border: 1px dashed var(--color-lost);
+}
+
+.type-badge.found {
+  background: rgba(45, 106, 79, 0.1);
+  color: var(--color-found);
+  border: 1px solid var(--color-found);
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  background: var(--color-background-stone);
+}
+
+.status-badge .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.status-badge.active .dot {
+  background: var(--color-success);
+}
+
+.status-badge.resolved .dot {
+  background: var(--color-text-muted);
+}
+
+.post-title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--color-text-main);
+  margin-bottom: 12px;
+}
+
+.post-date {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.post-metadata {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  margin-bottom: 32px;
+  padding: 24px;
+  background: var(--color-background-stone);
+  border-radius: var(--radius-md);
+}
+
+@media (min-width: 640px) {
+  .post-metadata {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.meta-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: var(--color-text-secondary);
+}
+
+.meta-label {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
+}
+
+.meta-value {
+  font-weight: 500;
+  color: var(--color-text-main);
+}
+
+.post-description {
+  margin-bottom: 40px;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--color-text-main);
+}
+
+.post-description p {
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.post-actions {
+  display: flex;
+  gap: 16px;
+  border-top: 1px solid var(--color-background-stone);
+  padding-top: 24px;
+}
+
+.btn-primary, .btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: white;
+  border: none;
+}
+
+.btn-primary:hover {
+  background: #23130d;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--color-text-main);
+  border: 1px solid var(--color-text-muted);
+}
+
+.btn-secondary:hover {
+  background: var(--color-background-stone);
+}

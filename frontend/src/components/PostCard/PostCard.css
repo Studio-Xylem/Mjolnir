@@ -1,0 +1,112 @@
+.post-card {
+  background-color: var(--surface-paper, #ffffff);
+  border-radius: var(--radius-md, 8px);
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .post-card {
+    transition: none;
+  }
+}
+
+.post-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.post-card-lost {
+  border-left: 3px dashed var(--signal-lost, #B85C38);
+}
+
+.post-card-found {
+  border-left: 3px solid var(--signal-found, #2D6A4F);
+}
+
+.post-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.post-card-image {
+  height: 160px;
+  width: 100%;
+  background-color: var(--surface-stone, #E8E0D8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.post-card-image.bg-lost { background-color: #F8EBE6; }
+.post-card-image.bg-found { background-color: #E6F0EB; }
+
+.post-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.post-card-placeholder {
+  color: var(--text-muted, #9A8B7D);
+  font-size: 0.875rem;
+}
+
+.post-card-content {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.post-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.post-card-category {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #6B5B4E);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.post-card-title {
+  margin: 0 0 1rem 0;
+  font-family: 'Fraunces', serif;
+  font-size: 1.25rem;
+  color: var(--text-primary, #2C1810);
+  line-height: 1.2;
+}
+
+.post-card-meta {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary, #6B5B4E);
+}
+
+@media (max-width: 480px) {
+  .post-card {
+    width: 100%;
+  }
+}

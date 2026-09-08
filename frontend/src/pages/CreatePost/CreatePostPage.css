@@ -1,0 +1,152 @@
+.create-post-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 32px 16px;
+}
+
+.page-heading {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  color: var(--color-text-main);
+  margin-bottom: 32px;
+}
+
+.create-post-form {
+  background: var(--color-background-paper);
+  padding: 32px;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-error-banner {
+  background: rgba(194, 59, 34, 0.1);
+  color: var(--color-error);
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  border-left: 4px solid var(--color-error);
+  font-weight: 500;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group.row {
+  flex-direction: column;
+}
+
+@media (min-width: 640px) {
+  .form-group.row {
+    flex-direction: row;
+    gap: 16px;
+  }
+  .form-group.row .col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+.form-label {
+  font-weight: 500;
+  color: var(--color-text-main);
+}
+
+.form-input {
+  padding: 12px 16px;
+  border: 1px solid var(--color-muted);
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+  background: white;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(44, 24, 16, 0.1);
+}
+
+.form-input.textarea {
+  resize: vertical;
+}
+
+.char-counter {
+  align-self: flex-end;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.type-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 640px) {
+  .type-cards {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.type-card {
+  border: 2px solid var(--color-muted);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+}
+
+.type-card input {
+  position: absolute;
+  opacity: 0;
+}
+
+.type-card:hover {
+  border-color: var(--color-text-secondary);
+}
+
+.type-card.selected.lost {
+  border-color: var(--color-lost);
+  background: rgba(184, 92, 56, 0.05);
+}
+
+.type-card.selected.found {
+  border-color: var(--color-found);
+  background: rgba(45, 106, 79, 0.05);
+}
+
+.type-card-title {
+  font-weight: 600;
+  font-size: 1.125rem;
+  color: var(--color-text-main);
+}
+
+.type-card-desc {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 16px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-background-stone);
+}
+
+.form-actions button {
+  min-width: 120px;
+}
