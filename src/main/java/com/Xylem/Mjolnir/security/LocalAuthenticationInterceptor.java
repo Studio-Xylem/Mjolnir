@@ -12,11 +12,14 @@ import org.springframework.web.servlet.HandlerInterceptor;
 public class LocalAuthenticationInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        if ("GET".equalsIgnoreCase(request.getMethod()) || "OPTIONS".equalsIgnoreCase(request.getMethod())) {
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             return true;
         }
         String userId = request.getHeader("X-User-Id");
         if (userId == null || userId.isBlank()) {
+            if ("GET".equalsIgnoreCase(request.getMethod())) {
+                return true;
+            }
             throw new UnauthorizedException("Provide X-User-Id for local authentication");
         }
         CurrentUser.set(new AuthenticatedUser(userId.trim(), request.getHeader("X-User-Email"),
