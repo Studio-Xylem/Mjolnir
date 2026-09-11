@@ -1,5 +1,6 @@
 package com.Xylem.Mjolnir.repository;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,6 +46,17 @@ public class PostRepository {
         }
     }
 
+    public void deleteById(String id) {
+        try {
+            firestore.collection("posts").document(id).delete().get();
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Unable to delete post", exception);
+        } catch (Exception exception) {
+            throw new IllegalStateException("Unable to delete post", exception);
+        }
+    }
+
     public List<Post> findByUserId(String userId) {
         return query(firestore.collection("posts").whereEqualTo("userId", userId));
     }
@@ -56,6 +68,34 @@ public class PostRepository {
     public List<Post> findByType(PostType type) {
         return query(firestore.collection("posts").whereEqualTo("type", type.name())
                 .whereEqualTo("status", PostStatus.ACTIVE.name()));
+    }
+
+    public List<Post> findPotentialMatches(Post lostPost) {
+        return findByType(PostType.FOUND).stream()
+                .filter(foundPost -> isPotentialMatch(lostPost, foundPost))
+                .toList();
+    }
+
+    private boolean isPotentialMatch(Post lostPost, Post foundPost) {
+        if (!sameText(lostPost.getCategory(), foundPost.getCategory())) return false;
+        if (!hasSharedTerm(lostPost.getTitle(), foundPost.getTitle())
+                && !hasSharedTerm(lostPost.getLocation(), foundPost.getLocation())) return false;
+        if (lostPost.getLostAt() == null || foundPost.getFoundAt() == null) return true;
+        return Math.abs(Duration.between(lostPost.getLostAt(), foundPost.getFoundAt()).toDays()) <= 7;
+    }
+
+    private boolean sameText(String first, String second) {
+        return first != null && second != null && first.trim().equalsIgnoreCase(second.trim());
+    }
+
+    private boolean hasSharedTerm(String first, String second) {
+        if (first == null || second == null) return false;
+        var secondTerms = java.util.Arrays.stream(second.toLowerCase().split("\\W+"))
+                .filter(term -> term.length() >= 3)
+                .collect(java.util.stream.Collectors.toSet());
+        return java.util.Arrays.stream(first.toLowerCase().split("\\W+"))
+                .filter(term -> term.length() >= 3)
+                .anyMatch(secondTerms::contains);
     }
 
     public ResolutionResult resolveIfActive(String id) {

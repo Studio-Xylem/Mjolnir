@@ -13,7 +13,12 @@ public class Post {
     private PostType type;
     private PostStatus status;
     private String location;
-    private String currentCustody;
+    private CurrentCustody currentCustody;
+    private String custodyLocation;
+    private ContactType contactType;
+    private String contactValue;
+    private Instant lostAt;
+    private Instant foundAt;
     private Instant createdAt;
 
     protected Post() {
@@ -27,7 +32,8 @@ public class Post {
         this.type = type;
         this.location = location;
         this.status = PostStatus.ACTIVE;
-        this.currentCustody = "";
+        this.custodyLocation = "";
+        this.contactValue = "";
     }
 
     void initializeDefaults() {
@@ -35,7 +41,8 @@ public class Post {
         if (createdAt == null) createdAt = Instant.now();
         if (status == null) status = PostStatus.ACTIVE;
         if (pictureUrl == null) pictureUrl = "";
-        if (currentCustody == null) currentCustody = "";
+        if (custodyLocation == null) custodyLocation = "";
+        if (contactValue == null) contactValue = "";
     }
 
     public String getId() { return id; }
@@ -56,8 +63,18 @@ public class Post {
     public void setStatus(PostStatus status) { this.status = status; }
     public String getLocation() { return location; }
     public void setLocation(String location) { this.location = location; }
-    public String getCurrentCustody() { return currentCustody; }
-    public void setCurrentCustody(String currentCustody) { this.currentCustody = currentCustody; }
+    public CurrentCustody getCurrentCustody() { return currentCustody; }
+    public void setCurrentCustody(CurrentCustody currentCustody) { this.currentCustody = currentCustody; }
+    public String getCustodyLocation() { return custodyLocation; }
+    public void setCustodyLocation(String custodyLocation) { this.custodyLocation = custodyLocation; }
+    public ContactType getContactType() { return contactType; }
+    public void setContactType(ContactType contactType) { this.contactType = contactType; }
+    public String getContactValue() { return contactValue; }
+    public void setContactValue(String contactValue) { this.contactValue = contactValue; }
+    public Instant getLostAt() { return lostAt; }
+    public void setLostAt(Instant lostAt) { this.lostAt = lostAt; }
+    public Instant getFoundAt() { return foundAt; }
+    public void setFoundAt(Instant foundAt) { this.foundAt = foundAt; }
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
 }
