@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { createPost } from '../../services/posts';
 import { PostType } from '../../models';
 import { ImageUpload } from '../../components/ImageUpload/ImageUpload';
+import { AuthModal } from '../../components/AuthModal/AuthModal';
 import './CreatePostPage.css';
 
 export const CreatePostPage: React.FC = () => {
@@ -20,12 +21,7 @@ export const CreatePostPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      alert('You must be logged in to create a post.'); // Replace with toast
-      navigate('/');
-    }
-  }, [isAuthenticated, isLoading, navigate]);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,7 +42,6 @@ export const CreatePostPage: React.FC = () => {
         location,
         pictureUrl: pictureUrl || undefined,
       });
-      alert('Post created successfully!');
       navigate(`/post/${newPost.id}`);
     } catch (err: any) {
       setError(err.message || 'Failed to create post. Please try again.');
@@ -54,7 +49,22 @@ export const CreatePostPage: React.FC = () => {
     }
   };
 
-  if (isLoading || !isAuthenticated) return null;
+  if (!isLoading && !isAuthenticated) {
+    return (
+      <div className="create-post-page">
+        <div className="auth-required-container" style={{ textAlign: 'center', padding: '4rem 1rem' }}>
+          <h2 style={{ fontFamily: 'Fraunces, serif', marginBottom: '1rem' }}>Sign in to report an item</h2>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>
+            You need an account to publish a lost or found item listing.
+          </p>
+          <button className="btn-primary" onClick={() => setIsAuthModalOpen(true)}>
+            Sign In / Register
+          </button>
+        </div>
+        <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+      </div>
+    );
+  }
 
   return (
     <div className="create-post-page">

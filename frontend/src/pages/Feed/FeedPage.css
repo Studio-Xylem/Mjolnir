@@ -7,7 +7,7 @@
 .feed-title {
   font-family: var(--font-display);
   font-size: 2.5rem;
-  color: var(--color-text-main);
+  color: var(--text-primary, #2C1810);
   margin-bottom: 24px;
 }
 
@@ -31,7 +31,7 @@
 
 .filter-bar {
   display: flex;
-  background: var(--color-background-stone);
+  background: var(--surface-stone, #E8E0D8);
   border-radius: var(--radius-md);
   padding: 4px;
   gap: 4px;
@@ -43,7 +43,7 @@
   background: transparent;
   border-radius: var(--radius-sm);
   font-weight: 500;
-  color: var(--color-text-secondary);
+  color: var(--text-secondary, #6B5B4E);
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -53,17 +53,17 @@
 }
 
 .filter-btn.active {
-  background: var(--color-background-paper);
-  color: var(--color-text-main);
+  background: var(--surface-white, #FFFFFF);
+  color: var(--text-primary, #2C1810);
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .filter-btn.lost.active {
-  color: var(--color-lost);
+  color: var(--signal-lost, #B85C38);
 }
 
 .filter-btn.found.active {
-  color: var(--color-found);
+  color: var(--signal-found, #2D6A4F);
 }
 
 .search-container {

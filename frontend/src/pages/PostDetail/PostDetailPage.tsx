@@ -20,9 +20,12 @@ export const PostDetailPage: React.FC = () => {
   const fetchPost = useCallback(() => getPost(id!), [id]);
   const { data: post, isLoading, error, retry } = useApi(fetchPost, [fetchPost]);
 
+  const [copied, setCopied] = useState(false);
+
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
-    alert('Link copied to clipboard!'); // Replace with toast if available
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const handleResolve = async () => {
@@ -115,7 +118,7 @@ export const PostDetailPage: React.FC = () => {
 
           <div className="post-actions">
             <button className="btn-secondary" onClick={handleCopyLink}>
-              <Share2 size={20} /> Share
+              <Share2 size={20} /> {copied ? 'Copied!' : 'Share'}
             </button>
             
             {isOwner && !isResolved && (

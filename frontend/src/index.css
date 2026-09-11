@@ -135,3 +135,62 @@ img, picture, video, canvas, svg {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-secondary);
 }
+
+/* ─── Global Button Utilities ─── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  background-color: var(--interactive-primary, #2C1810);
+  color: var(--text-inverse, #FAF6F1);
+  border: none;
+  border-radius: var(--radius-md, 8px);
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--weight-semibold, 600);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color var(--duration-fast, 120ms) ease;
+}
+
+.btn-primary:hover {
+  background-color: var(--interactive-primary-hover, #4A3328);
+  color: var(--text-inverse, #FAF6F1);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: var(--interactive-disabled, #C4B8AC);
+  color: var(--surface-paper, #FAF6F1);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  background-color: transparent;
+  color: var(--text-primary, #2C1810);
+  border: 1px solid var(--border-color, #D4C9BC);
+  border-radius: var(--radius-md, 8px);
+  font-family: var(--font-body);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--weight-semibold, 600);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color var(--duration-fast, 120ms) ease, border-color var(--duration-fast, 120ms) ease;
+}
+
+.btn-secondary:hover {
+  background-color: var(--surface-stone, #E8E0D8);
+  border-color: var(--text-muted, #9A8B7D);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

@@ -12,9 +12,9 @@
 }
 
 .page-title {
-  font-family: var(--font-display);
+  font-family: var(--font-display, 'Fraunces', serif);
   font-size: 2.5rem;
-  color: var(--color-text-main);
+  color: var(--text-primary, #2C1810);
 }
 
 .posts-grid {
@@ -33,24 +33,4 @@
   .posts-grid {
     grid-template-columns: repeat(3, 1fr);
   }
-}
-
-.btn-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 24px;
-  border-radius: var(--radius-md);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  background: var(--color-primary);
-  color: white;
-  text-decoration: none;
-  border: none;
-}
-
-.btn-primary:hover {
-  background: #23130d;
 }
