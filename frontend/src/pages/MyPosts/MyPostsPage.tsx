@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useApi } from '../../hooks/useApi';
@@ -9,20 +9,33 @@ import { ErrorState } from '../../components/ErrorState';
 import { EmptyState } from '../../components/EmptyState';
 import './MyPostsPage.css';
 
+import { AuthModal } from '../../components/AuthModal/AuthModal';
+
 export const MyPostsPage: React.FC = () => {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      navigate('/');
-    }
-  }, [isAuthenticated, authLoading, navigate]);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const fetchPosts = useCallback(() => getMyPosts(), []);
-  const { data: posts, isLoading, error, retry } = useApi(fetchPosts, [fetchPosts]);
+  const { data: posts, isLoading, error, retry } = useApi(fetchPosts, [fetchPosts, isAuthenticated]);
 
-  if (authLoading || !isAuthenticated) return null;
+  if (!authLoading && !isAuthenticated) {
+    return (
+      <div className="my-posts-page">
+        <div className="auth-required-container" style={{ textAlign: 'center', padding: '4rem 1rem' }}>
+          <h2 style={{ fontFamily: 'Fraunces, serif', marginBottom: '1rem' }}>Sign in to view your posts</h2>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>
+            Manage and track items you've reported lost or found.
+          </p>
+          <button className="btn-primary" onClick={() => setIsAuthModalOpen(true)}>
+            Sign In / Register
+          </button>
+        </div>
+        <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+      </div>
+    );
+  }
+
+  if (authLoading) return null;
 
   return (
     <div className="my-posts-page">

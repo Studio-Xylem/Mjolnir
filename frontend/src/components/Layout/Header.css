@@ -59,6 +59,81 @@
   border-bottom-color: var(--signal-found, #2D6A4F);
 }
 
+.header-auth-section {
+  display: flex;
+  align-items: center;
+  margin-left: 0.5rem;
+}
+
+.btn-signin {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.85rem;
+  background-color: var(--interactive-primary, #2C1810);
+  color: var(--text-inverse, #FAF6F1);
+  border: none;
+  border-radius: var(--radius-md, 8px);
+  font-family: var(--font-body, sans-serif);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 120ms ease;
+}
+
+.btn-signin:hover {
+  background-color: var(--interactive-primary-hover, #4A3328);
+}
+
+.user-profile-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--surface-stone, #E8E0D8);
+  padding: 0.25rem 0.5rem 0.25rem 0.25rem;
+  border-radius: var(--radius-full, 9999px);
+}
+
+.user-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: var(--interactive-focus, #B85C38);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.user-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary, #2C1810);
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-signout {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary, #6B5B4E);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 50%;
+  transition: color 120ms ease;
+}
+
+.btn-signout:hover {
+  color: var(--feedback-error, #C23B22);
+}
+
 @media (max-width: 768px) {
   .header-menu-btn {
     display: block;

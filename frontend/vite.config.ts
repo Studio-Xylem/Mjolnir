@@ -16,9 +16,4 @@ export default defineConfig({
       },
     },
   },
-  build: {
-    rollupOptions: {
-      external: ['firebase/auth', 'firebase/app'],
-    },
-  },
 });

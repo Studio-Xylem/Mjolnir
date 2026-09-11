@@ -6,7 +6,7 @@
 }
 
 .image-upload-dropzone {
-  border: 2px dashed var(--color-muted);
+  border: 2px dashed var(--border-color, #D4C9BC);
   border-radius: var(--radius-md);
   padding: 32px 16px;
   display: flex;
@@ -15,31 +15,31 @@
   justify-content: center;
   text-align: center;
   cursor: pointer;
-  background-color: var(--color-background-paper);
+  background-color: var(--surface-white, #FFFFFF);
   transition: all 0.2s ease;
-  color: var(--color-text-secondary);
+  color: var(--text-secondary, #6B5B4E);
 }
 
 .image-upload-dropzone:hover, .image-upload-dropzone:focus-visible {
-  border-color: var(--color-primary);
-  background-color: var(--color-background-stone);
+  border-color: var(--interactive-primary, #2C1810);
+  background-color: var(--surface-stone, #E8E0D8);
   outline: none;
 }
 
 .image-upload-dropzone.dragging {
-  border-color: var(--color-primary);
-  background-color: var(--color-background-stone);
+  border-color: var(--interactive-primary, #2C1810);
+  background-color: var(--surface-stone, #E8E0D8);
 }
 
 .image-upload-dropzone p {
   margin: 12px 0 4px;
   font-weight: 500;
-  color: var(--color-text-main);
+  color: var(--text-primary, #2C1810);
 }
 
 .file-hint {
   font-size: 0.875rem;
-  color: var(--color-text-muted);
+  color: var(--text-muted, #9A8B7D);
 }
 
 .hidden-input {
@@ -51,7 +51,7 @@
   width: 100%;
   border-radius: var(--radius-md);
   overflow: hidden;
-  background: var(--color-background-stone);
+  background: var(--surface-stone, #E8E0D8);
 }
 
 .image-upload-preview img {
@@ -83,7 +83,7 @@
 }
 
 .image-upload-progress {
-  border: 1px solid var(--color-muted);
+  border: 1px solid var(--border-color, #D4C9BC);
   border-radius: var(--radius-md);
   padding: 16px;
   text-align: center;
@@ -92,7 +92,7 @@
 .progress-bar {
   width: 100%;
   height: 8px;
-  background: var(--color-background-stone);
+  background: var(--surface-stone, #E8E0D8);
   border-radius: var(--radius-sm);
   margin-top: 8px;
   overflow: hidden;
@@ -100,7 +100,7 @@
 
 .progress-fill {
   height: 100%;
-  background: var(--color-primary);
+  background: var(--interactive-primary, #2C1810);
   transition: width 0.2s ease;
 }
 
@@ -108,7 +108,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--color-error);
+  color: var(--feedback-error, #C23B22);
   font-size: 0.875rem;
   margin-top: 8px;
 }
