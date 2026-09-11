@@ -25,6 +25,8 @@ export interface Post {
   status: PostStatus;
   location: string;
   currentCustody: string;
+  contactDetails?: string;
+  lostOrFoundAt?: string;
   createdAt: string;
 }
 
@@ -35,6 +37,22 @@ export interface CreatePostDTO {
   type: PostType;
   location: string;
   pictureUrl?: string;
+  currentCustody?: string;
+  contactDetails?: string;
+  lostOrFoundAt?: string;
+}
+
+export interface UpdatePostDTO {
+  title?: string;
+  description?: string;
+  pictureUrl?: string;
+  category?: string;
+  type?: PostType;
+  status?: PostStatus;
+  location?: string;
+  currentCustody?: string;
+  contactDetails?: string;
+  lostOrFoundAt?: string;
 }
 
 export interface ApiError {
