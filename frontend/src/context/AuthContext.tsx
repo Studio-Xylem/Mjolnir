@@ -13,7 +13,6 @@ interface AuthContextValue {
   refreshUser: () => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, username: string) => Promise<void>;
-  loginAsLocalUser: (id: string, name: string) => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -58,7 +57,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const signIn = async (email: string, password: string) => {
     if (!auth) {
-      throw new Error('Firebase Auth is not configured. Use Local Dev Mode instead.');
+      throw new Error('Firebase Auth is not configured.');
     }
     setIsLoading(true);
     setError(null);
@@ -74,7 +73,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const signUp = async (email: string, password: string, username: string) => {
     if (!auth) {
-      throw new Error('Firebase Auth is not configured. Use Local Dev Mode instead.');
+      throw new Error('Firebase Auth is not configured.');
     }
     setIsLoading(true);
     setError(null);
@@ -91,21 +90,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const loginAsLocalUser = async (id: string, name: string) => {
-    if (authAdapter.setLocalUser) {
-      authAdapter.setLocalUser(id, name);
-    }
-    await refreshUser();
-  };
-
   const signOut = async () => {
     setIsLoading(true);
     try {
       if (auth?.currentUser) {
         await firebaseSignOut(auth);
-      }
-      if (authAdapter.clearLocalUser) {
-        authAdapter.clearLocalUser();
       }
       setUser(null);
       setIsAuthenticated(false);
@@ -129,7 +118,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     refreshUser,
     signIn,
     signUp,
-    loginAsLocalUser,
     signOut,
   };
 

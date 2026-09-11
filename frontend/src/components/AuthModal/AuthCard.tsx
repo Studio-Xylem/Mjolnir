@@ -9,9 +9,6 @@ import {
   Loader2, 
   CheckCircle2,
   Sparkles,
-  Code,
-  ChevronDown,
-  ChevronUp
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import './AuthCard.css';
@@ -29,7 +26,7 @@ export const AuthCard: React.FC<AuthCardProps> = ({
   onModeChange,
   showHeader = true
 }) => {
-  const { signIn, signUp, loginAsLocalUser, isLoading, error: contextError } = useAuth();
+  const { signIn, signUp, isLoading, error: contextError } = useAuth();
   const [mode, setMode] = useState<'signin' | 'signup'>(initialMode);
   
   const [email, setEmail] = useState('');
@@ -39,10 +36,6 @@ export const AuthCard: React.FC<AuthCardProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-
-  // Dev bypass section
-  const [showDevBypass, setShowDevBypass] = useState(false);
-  const [devUsername, setDevUsername] = useState('Local Dev');
 
   const switchMode = (newMode: 'signin' | 'signup') => {
     setMode(newMode);
@@ -99,19 +92,6 @@ export const AuthCard: React.FC<AuthCardProps> = ({
         message = 'Network error. Please check your internet connection.';
       }
       setFormError(message);
-    }
-  };
-
-  const handleDevLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const sanitizedId = devUsername.toLowerCase().replace(/[^a-z0-9]/g, '-') || 'test-user';
-      await loginAsLocalUser(sanitizedId, devUsername || 'Local Dev');
-      if (onSuccess) {
-        onSuccess();
-      }
-    } catch (err: any) {
-      setFormError(err.message || 'Failed to sign in with dev mode.');
     }
   };
 
@@ -317,43 +297,6 @@ export const AuthCard: React.FC<AuthCardProps> = ({
           </p>
         )}
 
-        {/* Discreet Local Dev Drawer */}
-        <div className="auth-dev-section">
-          <button
-            type="button"
-            className="auth-dev-toggle"
-            onClick={() => setShowDevBypass(!showDevBypass)}
-          >
-            <Code size={13} />
-            <span>Developer bypass</span>
-            {showDevBypass ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-          </button>
-
-          {showDevBypass && (
-            <div className="auth-dev-box">
-              <p className="auth-dev-description">
-                Quickly sign in as a local mock user without needing Firebase credentials.
-              </p>
-              <div className="auth-dev-row">
-                <input
-                  type="text"
-                  value={devUsername}
-                  onChange={(e) => setDevUsername(e.target.value)}
-                  placeholder="Test User Name"
-                  className="auth-dev-input"
-                />
-                <button
-                  type="button"
-                  onClick={handleDevLogin}
-                  className="auth-dev-btn"
-                  disabled={isLoading}
-                >
-                  Quick Sign In
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
       </footer>
     </div>
   );
