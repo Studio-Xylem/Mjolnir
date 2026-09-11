@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, Save, Calendar, Shield, UserCheck, Building2, Phone } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { getPost, updatePost } from '../../services/posts';
-import { PostType, Post } from '../../models';
+import { ContactType, CurrentCustody, PostType, Post } from '../../models';
 import { ImageUpload } from '../../components/ImageUpload/ImageUpload';
 import { CategorySelect } from '../../components/CategorySelect/CategorySelect';
 import { LoadingState } from '../../components/LoadingState';
@@ -49,12 +49,13 @@ export const EditPostPage: React.FC = () => {
         setDescription(data.description);
         setCategory(data.category);
         setLocation(data.location);
-        setContactDetails(data.contactDetails || '');
+        setContactDetails(data.contactValue || '');
         setPictureUrl(data.pictureUrl || '');
 
-        if (data.lostOrFoundAt) {
+        const eventTime = data.type === PostType.LOST ? data.lostAt : data.foundAt;
+        if (eventTime) {
           try {
-            const d = new Date(data.lostOrFoundAt);
+            const d = new Date(eventTime);
             d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
             setLostOrFoundAt(d.toISOString().slice(0, 16));
           } catch {
@@ -67,11 +68,11 @@ export const EditPostPage: React.FC = () => {
         }
 
         if (data.currentCustody) {
-          if (data.currentCustody.toLowerCase().includes('self') || data.currentCustody.toLowerCase().includes('finder')) {
+          if (data.currentCustody === CurrentCustody.SELF) {
             setCustodyType('self');
           } else {
             setCustodyType('handed_over');
-            setCustodyLocation(data.currentCustody);
+            setCustodyLocation(data.custodyLocation || '');
           }
         }
 
@@ -135,9 +136,7 @@ export const EditPostPage: React.FC = () => {
 
     const calculatedCustody =
       type === PostType.FOUND
-        ? custodyType === 'self'
-          ? 'With finder (Self custody)'
-          : custodyLocation.trim() || 'Handed over to authority'
+        ? custodyType === 'self' ? CurrentCustody.SELF : CurrentCustody.CUSTODY
         : undefined;
 
     try {
@@ -147,10 +146,15 @@ export const EditPostPage: React.FC = () => {
         description: description.trim(),
         category: category.trim(),
         location: location.trim(),
-        lostOrFoundAt,
+        lostAt: type === PostType.LOST ? new Date(lostOrFoundAt).toISOString() : undefined,
+        foundAt: type === PostType.FOUND ? new Date(lostOrFoundAt).toISOString() : undefined,
         pictureUrl: pictureUrl || undefined,
         currentCustody: calculatedCustody,
-        contactDetails: type === PostType.FOUND && custodyType === 'self' ? contactDetails.trim() : undefined,
+        custodyLocation: type === PostType.FOUND && custodyType !== 'self' ? custodyLocation.trim() : undefined,
+        contactType: type === PostType.FOUND && custodyType === 'self'
+          ? (contactDetails.includes('@') ? ContactType.EMAIL : ContactType.PHONE)
+          : undefined,
+        contactValue: type === PostType.FOUND && custodyType === 'self' ? contactDetails.trim() : undefined,
       });
 
       addToast('Post updated successfully!', 'success');

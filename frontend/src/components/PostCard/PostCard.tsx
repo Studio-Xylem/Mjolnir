@@ -56,8 +56,8 @@ export function PostCard({ post }: PostCardProps) {
             <div className="meta-item">
               <Clock size={16} />
               <span>
-                {post.lostOrFoundAt 
-                  ? `${isLost ? 'Lost ' : 'Found '} ${timeAgo(post.lostOrFoundAt)}` 
+                {(isLost ? post.lostAt : post.foundAt)
+                  ? `${isLost ? 'Lost ' : 'Found '} ${timeAgo((isLost ? post.lostAt : post.foundAt)! )}`
                   : timeAgo(post.createdAt)}
               </span>
             </div>

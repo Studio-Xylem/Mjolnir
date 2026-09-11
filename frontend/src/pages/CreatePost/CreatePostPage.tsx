@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { createPost, getMatchingFoundPosts } from '../../services/posts';
-import { PostType, Post } from '../../models';
+import { createPost, createLostPost, getMatchingFoundPosts } from '../../services/posts';
+import { ContactType, CurrentCustody, PostType, Post } from '../../models';
 import { ImageUpload } from '../../components/ImageUpload/ImageUpload';
 import { AuthModal } from '../../components/AuthModal/AuthModal';
 import { CategorySelect } from '../../components/CategorySelect/CategorySelect';
@@ -61,35 +61,43 @@ export const CreatePostPage: React.FC = () => {
 
     const calculatedCustody =
       type === PostType.FOUND
-        ? custodyType === 'self'
-          ? 'With finder (Self custody)'
-          : custodyLocation.trim() || 'Handed over to authority'
+        ? custodyType === 'self' ? CurrentCustody.SELF : CurrentCustody.CUSTODY
         : undefined;
+    const postData = {
+      type,
+      title: title.trim(),
+      description: description.trim(),
+      category: category.trim(),
+      location: location.trim(),
+      pictureUrl: pictureUrl || undefined,
+      lostAt: type === PostType.LOST ? new Date(lostOrFoundAt).toISOString() : undefined,
+      foundAt: type === PostType.FOUND ? new Date(lostOrFoundAt).toISOString() : undefined,
+      currentCustody: calculatedCustody,
+      custodyLocation: type === PostType.FOUND && custodyType !== 'self' ? custodyLocation.trim() : undefined,
+      contactType: type === PostType.FOUND && custodyType === 'self'
+        ? (contactDetails.includes('@') ? ContactType.EMAIL : ContactType.PHONE)
+        : undefined,
+      contactValue: type === PostType.FOUND && custodyType === 'self' ? contactDetails.trim() : undefined,
+    };
 
     try {
-      const newPost = await createPost({
-        type,
-        title: title.trim(),
-        description: description.trim(),
-        category: category.trim(),
-        location: location.trim(),
-        lostOrFoundAt,
-        pictureUrl: pictureUrl || undefined,
-        currentCustody: calculatedCustody,
-        contactDetails: type === PostType.FOUND && custodyType === 'self' ? contactDetails.trim() : undefined,
-      });
+      const result = type === PostType.LOST
+        ? await createLostPost(postData)
+        : { post: await createPost(postData), matches: [] };
+      const newPost = result.post;
 
       setCreatedPostId(newPost.id);
 
       // If user posted a LOST item, check database for matching found posts
       if (type === PostType.LOST) {
         try {
-          const matches = await getMatchingFoundPosts({
+          const matches = result.matches.length > 0 ? result.matches : await getMatchingFoundPosts({
+            id: newPost.id,
             title: title.trim(),
             category: category.trim(),
             location: location.trim(),
             description: description.trim(),
-            lostOrFoundAt,
+            lostAt: new Date(lostOrFoundAt).toISOString(),
           });
 
           if (matches.length > 0) {

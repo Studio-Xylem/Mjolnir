@@ -48,6 +48,11 @@ public class PostController {
         return PostResponse.from(postService.getById(id));
     }
 
+    @GetMapping("/{id}/matches")
+    List<PostResponse> getMatches(@PathVariable String id) {
+        return postService.findMatches(postService.getById(id)).stream().map(PostResponse::from).toList();
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     PostResponse create(@Valid @RequestBody CreatePostRequest request) {

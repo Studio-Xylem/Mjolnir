@@ -1,14 +1,16 @@
 package com.Xylem.Mjolnir.security;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.HandlerInterceptor;
+
 import com.Xylem.Mjolnir.exception.UnauthorizedException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 @Component
 @ConditionalOnProperty(name = "app.auth.mode", havingValue = "firebase", matchIfMissing = true)
@@ -43,7 +45,8 @@ public class FirebaseAuthenticationInterceptor implements HandlerInterceptor {
 
     private boolean isPublicRead(String requestUri) {
         return "/api/posts".equals(requestUri)
-                || "/api/posts/public".equals(requestUri)
+            || "/api/posts/public".equals(requestUri)
+            || requestUri.matches("/api/posts/[^/]+/matches$")
             || (requestUri.matches("/api/posts/[^/]+$") && !"/api/posts/mine".equals(requestUri));
     }
 

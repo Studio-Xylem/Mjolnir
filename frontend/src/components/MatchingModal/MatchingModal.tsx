@@ -51,10 +51,10 @@ export const MatchingModal: React.FC<MatchingModalProps> = ({
                   <span className="matching-category-tag">
                     <Tag size={12} /> {post.category}
                   </span>
-                  {post.lostOrFoundAt && (
+                  {post.foundAt && (
                     <span className="matching-datetime">
                       <Calendar size={12} />
-                      Found at: {new Date(post.lostOrFoundAt).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
+                      Found at: {new Date(post.foundAt).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
                     </span>
                   )}
                 </div>
@@ -70,7 +70,7 @@ export const MatchingModal: React.FC<MatchingModalProps> = ({
                   {post.currentCustody && (
                     <div className="matching-meta-item custody">
                       <Shield size={14} />
-                      <span>Custody: <strong>{post.currentCustody}</strong></span>
+                      <span>Custody: <strong>{post.currentCustody}{post.custodyLocation ? `: ${post.custodyLocation}` : ''}</strong></span>
                     </div>
                   )}
                 </div>

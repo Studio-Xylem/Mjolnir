@@ -8,6 +8,16 @@ export enum PostStatus {
   RESOLVED = 'RESOLVED',
 }
 
+export enum CurrentCustody {
+  SELF = 'SELF',
+  CUSTODY = 'CUSTODY',
+}
+
+export enum ContactType {
+  PHONE = 'PHONE',
+  EMAIL = 'EMAIL',
+}
+
 export interface User {
   id: string;
   username: string;
@@ -24,9 +34,12 @@ export interface Post {
   type: PostType;
   status: PostStatus;
   location: string;
-  currentCustody: string;
-  contactDetails?: string;
-  lostOrFoundAt?: string;
+  currentCustody: CurrentCustody | null;
+  custodyLocation?: string;
+  contactType?: ContactType;
+  contactValue?: string;
+  lostAt?: string;
+  foundAt?: string;
   createdAt: string;
 }
 
@@ -37,22 +50,32 @@ export interface CreatePostDTO {
   type: PostType;
   location: string;
   pictureUrl?: string;
-  currentCustody?: string;
-  contactDetails?: string;
-  lostOrFoundAt?: string;
+  currentCustody?: CurrentCustody;
+  custodyLocation?: string;
+  contactType?: ContactType;
+  contactValue?: string;
+  lostAt?: string;
+  foundAt?: string;
 }
 
 export interface UpdatePostDTO {
-  title?: string;
-  description?: string;
+  title: string;
+  description: string;
   pictureUrl?: string;
-  category?: string;
-  type?: PostType;
-  status?: PostStatus;
-  location?: string;
-  currentCustody?: string;
-  contactDetails?: string;
-  lostOrFoundAt?: string;
+  category: string;
+  type: PostType;
+  location: string;
+  currentCustody?: CurrentCustody;
+  custodyLocation?: string;
+  contactType?: ContactType;
+  contactValue?: string;
+  lostAt?: string;
+  foundAt?: string;
+}
+
+export interface LostPostCreationResponse {
+  post: Post;
+  matches: Post[];
 }
 
 export interface ApiError {

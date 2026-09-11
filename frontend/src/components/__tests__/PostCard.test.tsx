@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect } from 'vitest';
 import { PostCard } from '../PostCard/PostCard';
-import { Post, PostType, PostStatus } from '../../models';
+import { Post, PostType, PostStatus, CurrentCustody } from '../../models';
 
 const dummyPost: Post = {
   id: 'post-123',
@@ -14,7 +14,7 @@ const dummyPost: Post = {
   type: PostType.LOST,
   status: PostStatus.ACTIVE,
   location: 'Downtown Station',
-  currentCustody: 'Self',
+  currentCustody: CurrentCustody.SELF,
   pictureUrl: '',
   createdAt: '2026-09-08T12:00:00Z',
 };

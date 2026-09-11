@@ -47,11 +47,12 @@ export const PostDetailPage: React.FC = () => {
   useEffect(() => {
     if (post && post.type === PostType.LOST) {
       getMatchingFoundPosts({
+        id: post.id,
         title: post.title,
         category: post.category,
         location: post.location,
         description: post.description,
-        lostOrFoundAt: post.lostOrFoundAt,
+        lostAt: post.lostAt,
       })
         .then((matches) => setMatchingFoundPosts(matches))
         .catch(() => setMatchingFoundPosts([]));
@@ -174,13 +175,13 @@ export const PostDetailPage: React.FC = () => {
             </div>
 
             {/* Lost At / Found At specific Date and Time */}
-            {post.lostOrFoundAt && (
+            {(isLost ? post.lostAt : post.foundAt) && (
               <div className="meta-item">
                 <Clock size={20} />
                 <div>
                   <span className="meta-label">{isLost ? 'Lost At' : 'Found At'}</span>
                   <span className="meta-value">
-                    {new Date(post.lostOrFoundAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+                    {new Date((isLost ? post.lostAt : post.foundAt)!).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
                   </span>
                 </div>
               </div>
@@ -192,18 +193,18 @@ export const PostDetailPage: React.FC = () => {
                 <Shield size={20} />
                 <div>
                   <span className="meta-label">Current Custody</span>
-                  <span className="meta-value">{post.currentCustody || 'With finder'}</span>
+                  <span className="meta-value">{post.currentCustody || 'With finder'}{post.custodyLocation ? `: ${post.custodyLocation}` : ''}</span>
                 </div>
               </div>
             )}
 
             {/* Finder's Contact Details (shown when self custody was chosen) */}
-            {post.contactDetails && (
+            {post.contactValue && (
               <div className="meta-item contact-highlight">
                 <Phone size={20} />
                 <div>
                   <span className="meta-label">Finder's Contact</span>
-                  <span className="meta-value contact-text">{post.contactDetails}</span>
+                  <span className="meta-value contact-text">{post.contactType === 'EMAIL' ? 'Email' : 'Phone'}: {post.contactValue}</span>
                 </div>
               </div>
             )}
