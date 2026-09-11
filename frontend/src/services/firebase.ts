@@ -1,4 +1,4 @@
-import { initializeApp } from 'firebase/app';
+import { getApp, getApps, initializeApp } from 'firebase/app';
 import { getAuth, type Auth } from 'firebase/auth';
 
 const firebaseConfig = {
@@ -11,8 +11,5 @@ const firebaseConfig = {
 };
 
 const hasFirebaseConfig = Object.values(firebaseConfig).every(Boolean);
-const app = hasFirebaseConfig ? initializeApp(firebaseConfig) : null;
-
+const app = hasFirebaseConfig ? (getApps().length ? getApp() : initializeApp(firebaseConfig)) : null;
 export const auth: Auth | null = app ? getAuth(app) : null;
-
-export default app;

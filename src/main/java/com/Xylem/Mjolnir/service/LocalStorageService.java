@@ -33,4 +33,10 @@ public class LocalStorageService {
             throw new IllegalStateException("Unable to store uploaded file", exception);
         }
     }
+
+    public Path resolve(String folder, String fileName) {
+        Path file = root.resolve(folder).resolve(fileName).normalize();
+        if (!file.startsWith(root)) throw new IllegalArgumentException("Invalid storage path");
+        return file;
+    }
 }

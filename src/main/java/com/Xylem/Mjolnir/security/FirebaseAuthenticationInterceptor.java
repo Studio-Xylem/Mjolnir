@@ -21,11 +21,14 @@ public class FirebaseAuthenticationInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        if ("GET".equalsIgnoreCase(request.getMethod()) || "OPTIONS".equalsIgnoreCase(request.getMethod())) {
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             return true;
         }
         String authorization = request.getHeader("Authorization");
         if (authorization == null || !authorization.startsWith("Bearer ")) {
+            if ("GET".equalsIgnoreCase(request.getMethod()) && isPublicRead(request.getRequestURI())) {
+                return true;
+            }
             throw new UnauthorizedException("Provide a Firebase ID token as a Bearer token");
         }
 
@@ -36,6 +39,12 @@ public class FirebaseAuthenticationInterceptor implements HandlerInterceptor {
         } catch (FirebaseAuthException exception) {
             throw new UnauthorizedException("The Firebase ID token is invalid or expired");
         }
+    }
+
+    private boolean isPublicRead(String requestUri) {
+        return "/api/posts".equals(requestUri)
+                || "/api/posts/public".equals(requestUri)
+            || (requestUri.matches("/api/posts/[^/]+$") && !"/api/posts/mine".equals(requestUri));
     }
 
     @Override

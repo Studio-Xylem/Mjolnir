@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { authAdapter } from '../services/auth';
+import { auth } from '../services/firebase';
 import { getCurrentUser, registerUser } from '../services/users';
 import { User } from '../models';
 
@@ -33,13 +34,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           setUser(profile);
         } catch (err: any) {
           if (err.status === 404 || err.message?.includes('404')) {
-            const localUserId = authAdapter.getUserId();
-            if (localUserId) {
-              const profile = await registerUser(import.meta.env.VITE_LOCAL_USER_NAME || 'Local User');
-              setUser(profile);
-            } else {
-              setUser(null);
-            }
+            const profile = await registerUser('Firebase User');
+            setUser(profile);
           } else {
             setError(err.message || 'Failed to fetch user profile');
           }
@@ -56,6 +52,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   useEffect(() => {
     refreshUser();
+    return auth?.onAuthStateChanged(() => refreshUser());
   }, [refreshUser]);
 
   const value: AuthContextValue = {

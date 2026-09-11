@@ -1,5 +1,9 @@
 package com.Xylem.Mjolnir.service;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.Xylem.Mjolnir.dto.CreatePostRequest;
 import com.Xylem.Mjolnir.exception.ConflictException;
 import com.Xylem.Mjolnir.exception.ForbiddenException;
@@ -9,9 +13,6 @@ import com.Xylem.Mjolnir.model.PostType;
 import com.Xylem.Mjolnir.repository.PostRepository;
 import com.Xylem.Mjolnir.repository.ResolutionResult;
 import com.Xylem.Mjolnir.security.AuthenticatedUser;
-import java.util.List;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class PostService {
@@ -48,7 +49,6 @@ public class PostService {
         return postRepository.findByUserId(user.uid());
     }
 
-    @Transactional
     public void resolve(AuthenticatedUser user, String id) {
         Post post = getById(id);
         if (!post.getUserId().equals(user.uid())) {

@@ -27,7 +27,7 @@ public class PostController {
         this.postService = postService;
     }
 
-    @GetMapping
+    @GetMapping({"", "/public"})
     List<PostResponse> getActive(@RequestParam(required = false) PostType type) {
         return postService.getActive(type).stream().map(PostResponse::from).toList();
     }
