@@ -42,16 +42,15 @@ The API upload endpoint intentionally stores image files in `data/uploads/posts`
 
 ## 3. Start the Spring Boot API
 
-Open a second PowerShell window. Keep the emulator window running, then set the local project ID and start the API:
+Open a second PowerShell window. Keep the emulator window running, then start the API with the local backend script:
 
 ```powershell
-$env:FIREBASE_PROJECT_ID = 'mjolnir-local'
-.\mvnw.cmd spring-boot:run
+.\scripts\run-backend-local.ps1
 ```
 
 The API listens on `http://localhost:8080`.
 
-The emulator environment variables must exist in the same terminal process that starts Spring Boot. The startup script sets them only in its own PowerShell process, so copy them into the API terminal when needed:
+The backend script exports the emulator variables in the same process that starts Spring Boot. If you prefer to run Maven directly, copy the variables first:
 
 ```powershell
 $env:FIREBASE_AUTH_EMULATOR_HOST = '127.0.0.1:9099'
