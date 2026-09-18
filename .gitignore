@@ -39,6 +39,9 @@ out/
 *.log
 logs/
 
+# Local runtime data
+/data/
+
 # Environment/local secrets
 .env
 .env.*

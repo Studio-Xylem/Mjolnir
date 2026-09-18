@@ -7,21 +7,17 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfiguration implements WebMvcConfigurer {
     private final List<HandlerInterceptor> authenticationInterceptors;
     private final String allowedOrigin;
-    private final String storageLocation;
 
     public WebConfiguration(List<HandlerInterceptor> authenticationInterceptors,
-                            @Value("${app.cors.allowed-origin:http://localhost:5173}") String allowedOrigin,
-                            @Value("${app.storage.location:./data/uploads}") String storageLocation) {
+                            @Value("${app.cors.allowed-origin:http://localhost:5173}") String allowedOrigin) {
         this.authenticationInterceptors = authenticationInterceptors;
         this.allowedOrigin = allowedOrigin;
-        this.storageLocation = storageLocation;
     }
 
     @Override
@@ -39,9 +35,4 @@ public class WebConfiguration implements WebMvcConfigurer {
                 .maxAge(3600);
     }
 
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/uploads/**")
-            .addResourceLocations(java.nio.file.Paths.get(storageLocation).toAbsolutePath().normalize().toUri().toString());
-    }
 }

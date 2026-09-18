@@ -1,8 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as firebaseSignOut } from 'firebase/auth';
-import { authAdapter } from '../services/auth';
-import { auth } from '../services/firebase';
-import { getCurrentUser, registerUser } from '../services/users';
+import { authAdapter, authStorage } from '../services/auth';
+import { getCurrentUser, loginUser, registerUser } from '../services/users';
 import { User } from '../models';
 
 interface AuthContextValue {
@@ -38,9 +36,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           setUser(profile);
         } catch (err: any) {
           if (err.status === 404 || err.message?.includes('404')) {
-            const defaultName = auth?.currentUser?.displayName || auth?.currentUser?.email?.split('@')[0] || 'User';
-            const profile = await registerUser(defaultName);
-            setUser(profile);
+            setUser(null);
           } else {
             setError(err.message || 'Failed to fetch user profile');
           }
@@ -56,13 +52,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    if (!auth) {
-      throw new Error('Firebase Auth is not configured.');
-    }
     setIsLoading(true);
     setError(null);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const result = await loginUser(email, password);
+      localStorage.setItem(authStorage.TOKEN_KEY, result.token);
+      localStorage.setItem(authStorage.USER_KEY, JSON.stringify(result.user));
       await refreshUser();
     } catch (err: any) {
       setIsLoading(false);
@@ -72,15 +67,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const signUp = async (email: string, password: string, username: string) => {
-    if (!auth) {
-      throw new Error('Firebase Auth is not configured.');
-    }
     setIsLoading(true);
     setError(null);
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      const profile = await registerUser(username);
-      setUser(profile);
+      const result = await registerUser(username, email, password);
+      localStorage.setItem(authStorage.TOKEN_KEY, result.token);
+      localStorage.setItem(authStorage.USER_KEY, JSON.stringify(result.user));
+      setUser(result.user);
       setIsAuthenticated(true);
     } catch (err: any) {
       setError(err.message || 'Failed to register account');
@@ -93,9 +86,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const signOut = async () => {
     setIsLoading(true);
     try {
-      if (auth?.currentUser) {
-        await firebaseSignOut(auth);
-      }
+      localStorage.removeItem(authStorage.TOKEN_KEY);
+      localStorage.removeItem(authStorage.USER_KEY);
       setUser(null);
       setIsAuthenticated(false);
     } catch (err: any) {
@@ -107,7 +99,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   useEffect(() => {
     refreshUser();
-    return auth?.onAuthStateChanged(() => refreshUser());
+    return undefined;
   }, [refreshUser]);
 
   const value: AuthContextValue = {

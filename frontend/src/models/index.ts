@@ -24,6 +24,11 @@ export interface User {
   createdAt: string;
 }
 
+export interface AuthResponse {
+  token: string;
+  user: User;
+}
+
 export interface Post {
   id: string;
   userId: string;

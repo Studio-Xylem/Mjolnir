@@ -3,6 +3,7 @@ package com.Xylem.Mjolnir.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.Xylem.Mjolnir.dto.CreatePostRequest;
 import com.Xylem.Mjolnir.dto.UpdatePostRequest;
@@ -60,6 +61,7 @@ public class PostService {
         return postRepository.findPotentialMatches(lostPost);
     }
 
+    @Transactional
     public void resolve(AuthenticatedUser user, String id) {
         Post post = getById(id);
         if (post.getType() == PostType.FOUND) {

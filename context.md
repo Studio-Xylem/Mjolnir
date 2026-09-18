@@ -1,78 +1,80 @@
 # Mjolnir project context
 
-## Purpose
+Mjolnir is a lost-and-found application built for low-cost local development and later deployment with Spring Boot, PostgreSQL, JWT authentication, Cloudinary, GitHub Pages, and Render.
 
-Mjolnir is an early-stage lost-and-found application. Its domain model supports users creating **LOST** or **FOUND** posts, attaching an optional image and location, tracking custody, and resolving a post.
+## Stack
 
-## Technology
+- Java 17 and Spring Boot 4 backend
+- Spring Data JPA with PostgreSQL-compatible persistence
+- Neon PostgreSQL for hosted persistence
+- Spring Security with stateless JWT email/password authentication
+- Cloudinary for image storage
+- React and Vite frontend
+- GitHub Pages frontend deployment
+- Render backend deployment
 
-- Java 17 with Spring Boot 4.0.8 and Maven
-- Spring MVC, validation, and Actuator dependencies
-- Google Cloud Firestore through `firebase-admin` and `google-cloud-firestore`
-- A Vite React frontend under `frontend/`
-- Firebase Authentication, Firestore, and Cloud Storage on the client
+Firebase, Firestore, Google authentication, and emulator services are not used.
 
-## Repository layout
+## Local development
 
-```text
-src/main/java/com/Xylem/Mjolnir/
-  MjolnirApplication.java     Spring Boot entry point
-  model/                      Firestore-backed domain objects and enums
-  repository/                 Firestore data-access classes
-src/main/resources/
-  application.properties      Firebase and server configuration
-frontend/src/
-  models/                     TypeScript domain types and DTOs
-  services/                   Firebase auth, API, and upload helpers
-src/test/java/                Spring Boot context-load test
-pom.xml                       Maven dependencies and build configuration
-```
-
-## Domain model
-
-### User (`users` collection)
-
-- `id`: Firestore document ID
-- `username`
-- `createdAt`: Firestore server timestamp
-
-### Post (`posts` collection)
-
-- `id`: Firestore document ID
-- `userId`, `title`, `description`, `category`, `location`
-- `pictureUrl` (optional)
-- `type`: `LOST` or `FOUND`
-- `status`: `ACTIVE` or `RESOLVED`
-- `currentCustody`
-- `createdAt`: Firestore server timestamp
-
-New Java `Post` instances default to `ACTIVE`. The TypeScript `postService.create` similarly assigns `ACTIVE`, an empty image URL when absent, empty custody, and the current Firebase timestamp.
-
-## Backend API capabilities
-
-- Firebase ID tokens are validated by the backend for all non-GET `/api/**` operations.
-- `POST /api/auth/register` provisions one profile for the signed-in Firebase user; `GET /api/auth/me` retrieves it.
-- Public endpoints list active posts or retrieve a post. Authenticated users can create posts and list their own posts.
-- Only a post owner can resolve it through `PATCH /api/posts/{id}/resolve`; a Firestore transaction prevents a second resolution.
-- Global validation and JSON error responses are provided by the REST exception handler.
-- The included Dockerfile packages the service for Google Cloud Run.
-- Firebase Authentication and Storage are configured in the React frontend with `VITE_FIREBASE_*` variables.
-
-## Current gaps and cautions
-
-- Firestore uses Application Default Credentials. Set `GOOGLE_APPLICATION_CREDENTIALS` to a service-account JSON file (or otherwise configure ADC); set `FIREBASE_PROJECT_ID` when the project cannot be inferred.
-- The Firestore queries that combine filters with `orderBy(createdAt)` may require composite indexes in Firebase.
-- Firebase Authentication sign-up/sign-in is intentionally performed by the React client. The backend accepts Firebase ID tokens rather than user passwords.
-
-## Run and test
-
-Use the Maven wrapper from the repository root:
+The backend uses file-based H2 by default for a zero-setup smoke test. For PostgreSQL-compatible local development:
 
 ```powershell
-.\mvnw.cmd test
+$env:JDBC_DATABASE_URL = 'jdbc:postgresql://localhost:5432/mjolnir'
+$env:DB_USERNAME = 'postgres'
+$env:DB_PASSWORD = 'postgres'
+$env:JWT_SECRET = 'replace-with-at-least-32-characters'
 .\mvnw.cmd spring-boot:run
 ```
 
-Running the application requires valid Application Default Credentials for the Firebase project.
+Set `CLOUDINARY_URL` before testing image uploads. Without it, the API starts but upload requests return a clear configuration error.
 
-Configure Firebase credentials and the frontend environment variables before running the application.
+## Authentication API
+
+- `POST /api/auth/register` accepts `username`, `email`, and `password` and returns `{ token, user }`.
+- `POST /api/auth/login` accepts `email` and `password` and returns `{ token, user }`.
+- `GET /api/auth/me` requires `Authorization: Bearer <jwt>`.
+
+Passwords are stored as BCrypt hashes. JWTs are stateless and expire according to `JWT_LIFETIME`.
+
+## Post API
+
+Public reads:
+
+- `GET /api/posts`
+- `GET /api/posts/public`
+- `GET /api/posts/{id}`
+- `GET /api/posts/{id}/matches`
+
+Authenticated operations:
+
+- `POST /api/posts`
+- `POST /api/posts/lost`
+- `GET /api/posts/mine`
+- `PATCH /api/posts/{id}`
+- `DELETE /api/posts/{id}`
+- `PATCH /api/posts/{id}/resolve`
+
+`FOUND` posts use `currentCustody` values `SELF` or `CUSTODY`. Self custody requires `contactType` and `contactValue`; custody requires `custodyLocation`. Lost posts use `lostAt`, found posts use `foundAt`.
+
+## Configuration
+
+Backend settings are environment-driven:
+
+- `JDBC_DATABASE_URL` or `DATABASE_URL`
+- `DB_USERNAME`
+- `DB_PASSWORD`
+- `JPA_DDL_AUTO`
+- `JWT_SECRET`
+- `JWT_LIFETIME`
+- `CLOUDINARY_URL`
+- `CORS_ALLOWED_ORIGIN`
+
+The frontend uses `VITE_API_BASE_URL`. For a GitHub Pages project site, set `VITE_API_BASE_URL` to the Render API URL and `VITE_BASE_PATH` to `/<repository-name>/`.
+
+## Deployment notes
+
+- Render should provide the database URL, `JWT_SECRET`, `CLOUDINARY_URL`, and `CORS_ALLOWED_ORIGIN`.
+- Neon connections should use SSL and a small connection pool.
+- Render filesystem storage is ephemeral; images must remain in Cloudinary.
+- H2 is for local smoke tests only. Use PostgreSQL locally when validating SQL behavior.

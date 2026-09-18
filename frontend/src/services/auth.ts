@@ -1,36 +1,27 @@
-import { auth } from './firebase';
-
 export interface AuthAdapter {
   getHeaders(): Promise<Record<string, string>>;
   isAuthenticated(): boolean;
   getUserId(): string | null;
 }
 
-export class FirebaseAuthAdapter implements AuthAdapter {
-  async getHeaders(): Promise<Record<string, string>> {
-    try {
-      const user = auth?.currentUser;
-      if (user) {
-        const token = await user.getIdToken();
-        return {
-          Authorization: `Bearer ${token}`,
-        };
-      }
+const TOKEN_KEY = 'mjolnir_access_token';
+const USER_KEY = 'mjolnir_user';
 
-      return {};
-    } catch (error) {
-      console.error('Auth header generation error', error);
-      return {};
-    }
+export class JwtAuthAdapter implements AuthAdapter {
+  async getHeaders(): Promise<Record<string, string>> {
+    const token = localStorage.getItem(TOKEN_KEY);
+    return token ? { Authorization: `Bearer ${token}` } : {};
   }
 
   isAuthenticated(): boolean {
-    return auth?.currentUser !== null && auth?.currentUser !== undefined;
+    return Boolean(localStorage.getItem(TOKEN_KEY));
   }
 
   getUserId(): string | null {
-    return auth?.currentUser?.uid ?? null;
+    const user = localStorage.getItem(USER_KEY);
+    return user ? JSON.parse(user).id : null;
   }
 }
 
-export const authAdapter = new FirebaseAuthAdapter();
+export const authAdapter = new JwtAuthAdapter();
+export const authStorage = { TOKEN_KEY, USER_KEY };

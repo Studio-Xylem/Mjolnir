@@ -1,133 +1,56 @@
 package com.Xylem.Mjolnir.repository;
 
-import java.time.Duration;
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.stereotype.Repository;
-
 import com.Xylem.Mjolnir.model.Post;
 import com.Xylem.Mjolnir.model.PostStatus;
 import com.Xylem.Mjolnir.model.PostType;
-import com.google.cloud.firestore.DocumentSnapshot;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.Query;
+import java.time.Duration;
+import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-@Repository
-public class PostRepository {
-    private final Firestore firestore;
+public interface PostRepository extends JpaRepository<Post, String> {
+    List<Post> findByUserIdOrderByCreatedAtDesc(String userId);
+    List<Post> findByStatusOrderByCreatedAtDesc(PostStatus status);
+    List<Post> findByTypeAndStatusOrderByCreatedAtDesc(PostType type, PostStatus status);
 
-    public PostRepository(Firestore firestore) {
-        this.firestore = firestore;
+    default List<Post> findByUserId(String userId) { return findByUserIdOrderByCreatedAtDesc(userId); }
+    default List<Post> findAllActive() { return findByStatusOrderByCreatedAtDesc(PostStatus.ACTIVE); }
+    default List<Post> findByType(PostType type) { return findByTypeAndStatusOrderByCreatedAtDesc(type, PostStatus.ACTIVE); }
+
+    @Modifying
+    @Query("update Post p set p.status = :resolved where p.id = :id and p.status = :active")
+    int markResolved(@Param("id") String id, @Param("active") PostStatus active,
+                     @Param("resolved") PostStatus resolved);
+
+    default ResolutionResult resolveIfActive(String id) {
+        Post post = findById(id).orElse(null);
+        if (post == null) return ResolutionResult.NOT_FOUND;
+        if (post.getStatus() != PostStatus.ACTIVE) return ResolutionResult.ALREADY_RESOLVED;
+        return markResolved(id, PostStatus.ACTIVE, PostStatus.RESOLVED) == 1
+                ? ResolutionResult.RESOLVED : ResolutionResult.ALREADY_RESOLVED;
     }
 
-    public Optional<Post> findById(String id) {
-        try {
-            return Optional.ofNullable(read(firestore.collection("posts").document(id).get().get()));
-        } catch (InterruptedException exception) {
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException("Unable to read post", exception);
-        } catch (Exception exception) {
-            throw new IllegalStateException("Unable to read post", exception);
-        }
-    }
-
-    public Post save(Post post) {
-        try {
-            if (post.getId() == null) post.setId(firestore.collection("posts").document().getId());
-            if (post.getCreatedAt() == null) post.setCreatedAt(java.time.Instant.now());
-            firestore.collection("posts").document(post.getId()).set(post).get();
-            return post;
-        } catch (InterruptedException exception) {
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException("Unable to save post", exception);
-        } catch (Exception exception) {
-            throw new IllegalStateException("Unable to save post", exception);
-        }
-    }
-
-    public void deleteById(String id) {
-        try {
-            firestore.collection("posts").document(id).delete().get();
-        } catch (InterruptedException exception) {
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException("Unable to delete post", exception);
-        } catch (Exception exception) {
-            throw new IllegalStateException("Unable to delete post", exception);
-        }
-    }
-
-    public List<Post> findByUserId(String userId) {
-        return query(firestore.collection("posts").whereEqualTo("userId", userId));
-    }
-
-    public List<Post> findAllActive() {
-        return query(firestore.collection("posts").whereEqualTo("status", PostStatus.ACTIVE.name()));
-    }
-
-    public List<Post> findByType(PostType type) {
-        return query(firestore.collection("posts").whereEqualTo("type", type.name())
-                .whereEqualTo("status", PostStatus.ACTIVE.name()));
-    }
-
-    public List<Post> findPotentialMatches(Post lostPost) {
+        default List<Post> findPotentialMatches(Post lostPost) {
         return findByType(PostType.FOUND).stream()
-                .filter(foundPost -> isPotentialMatch(lostPost, foundPost))
-                .toList();
-    }
+            .filter(found -> same(lostPost.getCategory(), found.getCategory()))
+            .filter(found -> sharedTerm(lostPost.getTitle(), found.getTitle())
+                || sharedTerm(lostPost.getLocation(), found.getLocation()))
+            .filter(found -> lostPost.getLostAt() == null || found.getFoundAt() == null
+                || Math.abs(Duration.between(lostPost.getLostAt(), found.getFoundAt()).toDays()) <= 7)
+            .toList();
+        }
 
-    private boolean isPotentialMatch(Post lostPost, Post foundPost) {
-        if (!sameText(lostPost.getCategory(), foundPost.getCategory())) return false;
-        if (!hasSharedTerm(lostPost.getTitle(), foundPost.getTitle())
-                && !hasSharedTerm(lostPost.getLocation(), foundPost.getLocation())) return false;
-        if (lostPost.getLostAt() == null || foundPost.getFoundAt() == null) return true;
-        return Math.abs(Duration.between(lostPost.getLostAt(), foundPost.getFoundAt()).toDays()) <= 7;
-    }
-
-    private boolean sameText(String first, String second) {
+        private static boolean same(String first, String second) {
         return first != null && second != null && first.trim().equalsIgnoreCase(second.trim());
-    }
+        }
 
-    private boolean hasSharedTerm(String first, String second) {
+        private static boolean sharedTerm(String first, String second) {
         if (first == null || second == null) return false;
-        var secondTerms = java.util.Arrays.stream(second.toLowerCase().split("\\W+"))
-                .filter(term -> term.length() >= 3)
-                .collect(java.util.stream.Collectors.toSet());
+        var terms = java.util.Arrays.stream(second.toLowerCase().split("\\W+"))
+            .filter(term -> term.length() >= 3).collect(java.util.stream.Collectors.toSet());
         return java.util.Arrays.stream(first.toLowerCase().split("\\W+"))
-                .filter(term -> term.length() >= 3)
-                .anyMatch(secondTerms::contains);
-    }
-
-    public ResolutionResult resolveIfActive(String id) {
-        try {
-            return firestore.runTransaction(transaction -> {
-                var reference = firestore.collection("posts").document(id);
-                DocumentSnapshot snapshot = transaction.get(reference).get();
-                if (!snapshot.exists()) return ResolutionResult.NOT_FOUND;
-                Post post = snapshot.toObject(Post.class);
-                if (post == null) return ResolutionResult.NOT_FOUND;
-                if (post.getStatus() != PostStatus.ACTIVE) return ResolutionResult.ALREADY_RESOLVED;
-                transaction.update(reference, "status", PostStatus.RESOLVED.name());
-                return ResolutionResult.RESOLVED;
-            }).get();
-        } catch (Exception exception) {
-            throw new IllegalStateException("Unable to resolve post", exception);
+            .filter(term -> term.length() >= 3).anyMatch(terms::contains);
         }
-    }
-
-    private List<Post> query(Query query) {
-        try {
-            return query.get().get().getDocuments().stream().map(this::read).toList();
-        } catch (Exception exception) {
-            throw new IllegalStateException("Unable to read posts", exception);
-        }
-    }
-
-    private Post read(DocumentSnapshot snapshot) {
-        if (!snapshot.exists()) return null;
-        Post post = snapshot.toObject(Post.class);
-        if (post == null) return null;
-        post.setId(snapshot.getId());
-        return post;
-    }
 }

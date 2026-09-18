@@ -3,18 +3,32 @@ package com.Xylem.Mjolnir.model;
 import java.time.Instant;
 import java.util.UUID;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "posts")
 public class Post {
+    @Id
     private String id;
     private String userId;
     private String title;
     private String description;
     private String pictureUrl;
     private String category;
+    @Enumerated(EnumType.STRING)
     private PostType type;
+    @Enumerated(EnumType.STRING)
     private PostStatus status;
     private String location;
+    @Enumerated(EnumType.STRING)
     private CurrentCustody currentCustody;
     private String custodyLocation;
+    @Enumerated(EnumType.STRING)
     private ContactType contactType;
     private String contactValue;
     private Instant lostAt;
@@ -36,6 +50,7 @@ public class Post {
         this.contactValue = "";
     }
 
+    @PrePersist
     void initializeDefaults() {
         if (id == null) id = UUID.randomUUID().toString();
         if (createdAt == null) createdAt = Instant.now();
