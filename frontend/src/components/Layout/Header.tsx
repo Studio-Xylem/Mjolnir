@@ -49,11 +49,9 @@ export function Header() {
 
             <div className="header-auth-section">
               {isAuthenticated ? (
-                <>
-                  <div className="user-profile-badge">
-                    <span className="user-avatar">{user?.username?.[0]?.toUpperCase() || 'U'}</span>
-                    <span className="user-name">{user?.username || 'User'}</span>
-                  </div>
+                <div className="user-profile-badge">
+                  <span className="user-avatar">{user?.username?.[0]?.toUpperCase() || 'U'}</span>
+                  <span className="user-name">{user?.username || 'User'}</span>
                   <button 
                     className="btn-signout" 
                     onClick={() => setIsSignOutDialogOpen(true)} 
@@ -61,9 +59,8 @@ export function Header() {
                     aria-label="Sign Out"
                   >
                     <LogOut size={15} />
-                    <span className="btn-signout-label">Sign Out</span>
                   </button>
-                </>
+                </div>
               ) : (
                 <button className="btn-signin" onClick={() => setIsAuthModalOpen(true)}>
                   <LogIn size={16} /> Sign In

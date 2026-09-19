@@ -2,14 +2,13 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { createPost, createLostPost, getMatchingFoundPosts } from '../../services/posts';
-import { ContactType, CurrentCustody, PostType, Post, PostStatus } from '../../models';
+import { ContactType, CurrentCustody, PostType, Post } from '../../models';
 import { ImageUpload } from '../../components/ImageUpload/ImageUpload';
 import { AuthModal } from '../../components/AuthModal/AuthModal';
 import { CategorySelect } from '../../components/CategorySelect/CategorySelect';
 import { MatchingModal } from '../../components/MatchingModal/MatchingModal';
-import { PostCard } from '../../components/PostCard/PostCard';
 import { useToast } from '../../components/Toast/Toast';
-import { Shield, UserCheck, Building2, Phone, Calendar, Sparkles, Eye, Lightbulb } from 'lucide-react';
+import { Shield, UserCheck, Building2, Phone, Calendar, Sparkles, AlertTriangle, CheckCircle } from 'lucide-react';
 import './CreatePostPage.css';
 
 export const CreatePostPage: React.FC = () => {
@@ -149,40 +148,28 @@ export const CreatePostPage: React.FC = () => {
     );
   }
 
-  const previewPost: Post = {
-    id: 'preview-post',
-    userId: 'current-user',
-    title: title.trim() || (type === PostType.LOST ? 'Lost Silver MacBook Air' : 'Found Blue Hydroflask Bottle'),
-    description: description.trim() || 'A detailed description with identifying marks, brand names, or serial numbers will appear here.',
-    category: category.trim() || 'General',
-    type,
-    status: PostStatus.ACTIVE,
-    location: location.trim() || (type === PostType.LOST ? 'Last seen location' : 'Found location'),
-    pictureUrl: pictureUrl || '',
-    currentCustody: type === PostType.FOUND ? (custodyType === 'self' ? CurrentCustody.SELF : CurrentCustody.CUSTODY) : null,
-    custodyLocation: type === PostType.FOUND && custodyType !== 'self' ? custodyLocation : undefined,
-    contactValue: type === PostType.FOUND && custodyType === 'self' ? contactDetails : undefined,
-    lostAt: type === PostType.LOST ? (lostOrFoundAt ? new Date(lostOrFoundAt).toISOString() : new Date().toISOString()) : undefined,
-    foundAt: type === PostType.FOUND ? (lostOrFoundAt ? new Date(lostOrFoundAt).toISOString() : new Date().toISOString()) : undefined,
-    createdAt: new Date().toISOString(),
-  };
-
   return (
     <div className="create-post-page">
       <header className="create-post-header">
         <h1 className="page-heading">Report an Item</h1>
         <p className="page-subheading">
-          Publish a listing to our community board. Once submitted, we will search for matching reports automatically.
+          Help reconnect lost belongings with their owners by sharing clear, accurate details.
         </p>
       </header>
       
-      <div className="create-post-layout">
-        <form onSubmit={handleSubmit} className="create-post-form">
+      <form onSubmit={handleSubmit} className="create-post-form">
         {error && <div className="form-error-banner">{error}</div>}
         
-        {/* Type Selection */}
-        <div className="form-group type-selection">
-          <label className="form-label">What are you reporting? *</label>
+        {/* Section 1: Type Selection */}
+        <section className="form-section-card">
+          <div className="section-card-header">
+            <span className="section-step-badge">01</span>
+            <div>
+              <h2 className="section-title">What are you reporting?</h2>
+              <p className="section-desc">Select whether you lost an item or found someone else's belonging.</p>
+            </div>
+          </div>
+          
           <div className="type-cards">
             <label className={`type-card ${type === PostType.LOST ? 'selected lost' : ''}`}>
               <input 
@@ -192,9 +179,14 @@ export const CreatePostPage: React.FC = () => {
                 checked={type === PostType.LOST}
                 onChange={() => setType(PostType.LOST)}
               />
+              <div className="type-card-header-row">
+                <AlertTriangle size={20} className="type-card-symbol lost-symbol" />
+                <span className="type-card-badge lost-badge">Lost</span>
+              </div>
               <span className="type-card-title">I Lost Something</span>
-              <span className="type-card-desc">Looking for an item you misplaced.</span>
+              <span className="type-card-desc">Looking for an item you misplaced or left behind.</span>
             </label>
+
             <label className={`type-card ${type === PostType.FOUND ? 'selected found' : ''}`}>
               <input 
                 type="radio" 
@@ -203,80 +195,119 @@ export const CreatePostPage: React.FC = () => {
                 checked={type === PostType.FOUND}
                 onChange={() => setType(PostType.FOUND)}
               />
+              <div className="type-card-header-row">
+                <CheckCircle size={20} className="type-card-symbol found-symbol" />
+                <span className="type-card-badge found-badge">Found</span>
+              </div>
               <span className="type-card-title">I Found Something</span>
-              <span className="type-card-desc">Found an item and want to connect it to the owner.</span>
+              <span className="type-card-desc">Found an item and want to help reconnect it to the owner.</span>
             </label>
           </div>
-        </div>
+        </section>
 
-        {/* Title */}
-        <div className="form-group">
-          <label htmlFor="title" className="form-label">Title *</label>
-          <input 
-            id="title"
-            type="text" 
-            className="form-input"
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-            maxLength={120}
-            required
-            placeholder={type === PostType.LOST ? "e.g. Lost Silver MacBook Air in Library" : "e.g. Found Blue Hydroflask Bottle"}
-          />
-          <div className="char-counter">{title.length}/120</div>
-        </div>
-
-        {/* Category & Location */}
-        <div className="form-group row">
-          <div className="col">
-            <label htmlFor="category" className="form-label">Category *</label>
-            <CategorySelect 
-              id="category"
-              value={category}
-              onChange={setCategory}
-              required
-              placeholder="Start typing or select category..."
-            />
+        {/* Section 2: Item Details */}
+        <section className="form-section-card">
+          <div className="section-card-header">
+            <span className="section-step-badge">02</span>
+            <div>
+              <h2 className="section-title">Item Details</h2>
+              <p className="section-desc">Provide descriptive details to help identify and verify the item.</p>
+            </div>
           </div>
-          <div className="col">
-            <label htmlFor="location" className="form-label">
-              {type === PostType.LOST ? 'Last Seen Location *' : 'Found Location *'}
-            </label>
-            <input 
-              id="location"
-              type="text" 
-              className="form-input"
-              value={location}
-              onChange={e => setLocation(e.target.value)}
-              maxLength={200}
-              required
-              placeholder={type === PostType.LOST ? "Where did you last have it?" : "Where was it found?"}
-            />
+
+          <div className="section-fields-grid">
+            {/* Title */}
+            <div className="form-group grid-col-full">
+              <label htmlFor="title" className="form-label">Item Title *</label>
+              <input 
+                id="title"
+                type="text" 
+                className="form-input"
+                value={title}
+                onChange={e => setTitle(e.target.value)}
+                maxLength={120}
+                required
+                placeholder={type === PostType.LOST ? "e.g. Lost Silver MacBook Air in Library" : "e.g. Found Blue Hydroflask Bottle"}
+              />
+              <div className="char-counter">{title.length}/120</div>
+            </div>
+
+            {/* Category & Location */}
+            <div className="form-group">
+              <label htmlFor="category" className="form-label">Category *</label>
+              <CategorySelect 
+                id="category"
+                value={category}
+                onChange={setCategory}
+                required
+                placeholder="Start typing or select category..."
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="location" className="form-label">
+                {type === PostType.LOST ? 'Last Seen Location *' : 'Found Location *'}
+              </label>
+              <input 
+                id="location"
+                type="text" 
+                className="form-input"
+                value={location}
+                onChange={e => setLocation(e.target.value)}
+                maxLength={200}
+                required
+                placeholder={type === PostType.LOST ? "Where did you last have it?" : "Where was it found?"}
+              />
+            </div>
+
+            {/* Date and Time: Lost At / Found At */}
+            <div className="form-group grid-col-full">
+              <label htmlFor="datetime" className="form-label">
+                <Calendar size={16} className="inline-icon" />
+                {type === PostType.LOST ? 'When was it lost? (Date & Time) *' : 'When was it found? (Date & Time) *'}
+              </label>
+              <input 
+                id="datetime"
+                type="datetime-local" 
+                className="form-input"
+                value={lostOrFoundAt}
+                onChange={e => setLostOrFoundAt(e.target.value)}
+                required
+              />
+            </div>
+
+            {/* Description */}
+            <div className="form-group grid-col-full">
+              <label htmlFor="description" className="form-label">Description *</label>
+              <textarea 
+                id="description"
+                className="form-input textarea"
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+                maxLength={2000}
+                required
+                rows={4}
+                placeholder="Provide detailed description (color, brand, identifying marks, serial numbers, unique scratches...)"
+              />
+              <div className="char-counter">{description.length}/2000</div>
+            </div>
           </div>
-        </div>
+        </section>
 
-        {/* Date and Time: Lost At / Found At */}
-        <div className="form-group">
-          <label htmlFor="datetime" className="form-label">
-            <Calendar size={16} className="inline-icon" />
-            {type === PostType.LOST ? 'Lost At (Date & Time) *' : 'Found At (Date & Time) *'}
-          </label>
-          <input 
-            id="datetime"
-            type="datetime-local" 
-            className="form-input"
-            value={lostOrFoundAt}
-            onChange={e => setLostOrFoundAt(e.target.value)}
-            required
-          />
-        </div>
-
-        {/* Custody Section for FOUND items */}
+        {/* Section 3: Custody for FOUND items */}
         {type === PostType.FOUND && (
-          <div className="form-group custody-group">
-            <label className="form-label">
-              <Shield size={16} className="inline-icon" />
-              Current Custody *
-            </label>
+          <section className="form-section-card custody-card">
+            <div className="section-card-header">
+              <span className="section-step-badge">03</span>
+              <div>
+                <h2 className="section-title">
+                  <Shield size={18} className="inline-icon" />
+                  Current Custody & Contact
+                </h2>
+                <p className="section-desc">Let the owner know who has the item and how they can safely retrieve it.</p>
+              </div>
+            </div>
+
             <div className="custody-type-radios">
               <label className={`custody-radio-card ${custodyType === 'self' ? 'active' : ''}`}>
                 <input
@@ -304,12 +335,11 @@ export const CreatePostPage: React.FC = () => {
                 <Building2 size={20} className="custody-card-icon" />
                 <div className="custody-card-text">
                   <strong>Handed Over To</strong>
-                  <span>Turned in to security or an office</span>
+                  <span>Turned in to security or campus office</span>
                 </div>
               </label>
             </div>
 
-            {/* If Self Custody: CONTACT DETAILS FIELD */}
             {custodyType === 'self' && (
               <div className="contact-details-box">
                 <label htmlFor="contact" className="form-label">
@@ -331,7 +361,6 @@ export const CreatePostPage: React.FC = () => {
               </div>
             )}
 
-            {/* If Handed Over: LOCATION / AUTHORITY DETAILS */}
             {custodyType === 'handed_over' && (
               <div className="handed-over-box">
                 <label htmlFor="handed-location" className="form-label">
@@ -361,40 +390,34 @@ export const CreatePostPage: React.FC = () => {
                 </div>
               </div>
             )}
-          </div>
+          </section>
         )}
 
-        {/* Description */}
-        <div className="form-group">
-          <label htmlFor="description" className="form-label">Description *</label>
-          <textarea 
-            id="description"
-            className="form-input textarea"
-            value={description}
-            onChange={e => setDescription(e.target.value)}
-            maxLength={2000}
-            required
-            rows={5}
-            placeholder="Provide detailed description (color, brand, identifying marks, serial numbers...)"
-          />
-          <div className="char-counter">{description.length}/2000</div>
-        </div>
+        {/* Section 4: Image Upload */}
+        <section className="form-section-card">
+          <div className="section-card-header">
+            <span className="section-step-badge">{type === PostType.FOUND ? '04' : '03'}</span>
+            <div>
+              <h2 className="section-title">Photo Attachment (Optional)</h2>
+              <p className="section-desc">Adding a photo helps people recognize and verify the item much faster.</p>
+            </div>
+          </div>
 
-        {/* Image Upload */}
-        <div className="form-group">
-          <label className="form-label">Image (Optional)</label>
-          <ImageUpload 
-            value={pictureUrl} 
-            onChange={setPictureUrl} 
-            onClear={() => setPictureUrl('')} 
-          />
-        </div>
+          <div className="form-group">
+            <ImageUpload 
+              value={pictureUrl} 
+              onChange={setPictureUrl} 
+              onClear={() => setPictureUrl('')} 
+            />
+          </div>
+        </section>
 
-        <div className="form-actions">
+        {/* Action Buttons */}
+        <div className="form-actions-bar">
           <button type="button" className="btn-secondary" onClick={() => navigate(-1)}>
             Cancel
           </button>
-          <button type="submit" className="btn-primary" disabled={isSubmitting}>
+          <button type="submit" className="btn-primary form-submit-btn" disabled={isSubmitting}>
             {isSubmitting ? 'Processing...' : (
               <>
                 {type === PostType.LOST && <Sparkles size={16} />}
@@ -405,50 +428,13 @@ export const CreatePostPage: React.FC = () => {
         </div>
       </form>
 
-      <aside className="create-post-sidebar">
-        <div className="preview-sticky-box">
-          <div className="preview-label-bar">
-            <span className="preview-tag">
-              <Eye size={14} /> Live Feed Preview
-            </span>
-            <span className="preview-subtag">Updates in real time</span>
-          </div>
-
-          <div className="preview-card-wrapper">
-            <PostCard post={previewPost} />
-          </div>
-
-          <div className="posting-tips-card">
-            <div className="tips-header">
-              <Lightbulb size={18} className="tips-bulb-icon" />
-              <h3 className="tips-title">Tips for Faster Reunion</h3>
-            </div>
-            <ul className="tips-list">
-              <li>
-                <strong>Be specific:</strong> Include unique marks, color shades, case types, or serial numbers.
-              </li>
-              <li>
-                <strong>Accurate location:</strong> Mention buildings, room numbers, or landmarks where it happened.
-              </li>
-              <li>
-                <strong>Clear photo:</strong> Posts with clear photos receive 3x more confirmed matches.
-              </li>
-              <li>
-                <strong>Automatic matching:</strong> When reporting lost, we instantly check existing found items in our database.
-              </li>
-            </ul>
-          </div>
-        </div>
-      </aside>
+      {/* Matching Found Items Modal */}
+      <MatchingModal
+        isOpen={isMatchingModalOpen}
+        matches={matchingFoundPosts}
+        onDismiss={handleDismissMatches}
+        onViewMatch={handleViewMatch}
+      />
     </div>
-
-    {/* Matching Found Items Modal */}
-    <MatchingModal
-      isOpen={isMatchingModalOpen}
-      matches={matchingFoundPosts}
-      onDismiss={handleDismissMatches}
-      onViewMatch={handleViewMatch}
-    />
-  </div>
   );
 };
