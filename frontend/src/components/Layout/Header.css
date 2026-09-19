@@ -62,6 +62,7 @@
 .header-auth-section {
   display: flex;
   align-items: center;
+  gap: 0.5rem;
   margin-left: 0.5rem;
 }
 
@@ -90,7 +91,7 @@
   align-items: center;
   gap: 0.5rem;
   background-color: var(--surface-stone, #E8E0D8);
-  padding: 0.25rem 0.5rem 0.25rem 0.25rem;
+  padding: 0.25rem 0.75rem 0.25rem 0.25rem;
   border-radius: var(--radius-full, 9999px);
 }
 
@@ -111,7 +112,7 @@
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--text-primary, #2C1810);
-  max-width: 100px;
+  max-width: 120px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -119,19 +120,28 @@
 
 .btn-signout {
   background: transparent;
-  border: none;
+  border: 1px solid var(--border-color, #D4C9BC);
   color: var(--text-secondary, #6B5B4E);
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  padding: 4px;
-  border-radius: 50%;
-  transition: color 120ms ease;
+  gap: 0.35rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: var(--radius-full, 9999px);
+  font-family: var(--font-body, inherit);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  transition: all 120ms ease;
 }
 
 .btn-signout:hover {
+  background-color: var(--feedback-error-light, #FCEAE7);
+  border-color: rgba(194, 59, 34, 0.3);
   color: var(--feedback-error, #C23B22);
+}
+
+.btn-signout-label {
+  display: inline;
 }
 
 @media (max-width: 768px) {

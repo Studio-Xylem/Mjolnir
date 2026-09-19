@@ -15,6 +15,7 @@ export function PostTypeBadge({ type, size = 'md' }: PostTypeBadgeProps) {
     <div 
       className={`post-type-badge badge-${type.toLowerCase()} badge-${size}`}
       role="status"
+      title={type}
     >
       <span className="sr-only">Type: {type}</span>
       {isLost ? (
@@ -22,7 +23,6 @@ export function PostTypeBadge({ type, size = 'md' }: PostTypeBadgeProps) {
       ) : (
         <CheckCircle size={size === 'sm' ? 14 : 18} aria-hidden="true" />
       )}
-      <span>{type}</span>
     </div>
   );
 }

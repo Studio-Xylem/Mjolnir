@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { createPost, createLostPost, getMatchingFoundPosts } from '../../services/posts';
-import { ContactType, CurrentCustody, PostType, Post } from '../../models';
+import { ContactType, CurrentCustody, PostType, Post, PostStatus } from '../../models';
 import { ImageUpload } from '../../components/ImageUpload/ImageUpload';
 import { AuthModal } from '../../components/AuthModal/AuthModal';
 import { CategorySelect } from '../../components/CategorySelect/CategorySelect';
 import { MatchingModal } from '../../components/MatchingModal/MatchingModal';
+import { PostCard } from '../../components/PostCard/PostCard';
 import { useToast } from '../../components/Toast/Toast';
-import { Shield, UserCheck, Building2, Phone, Mail, Calendar, Sparkles } from 'lucide-react';
+import { Shield, UserCheck, Building2, Phone, Calendar, Sparkles, Eye, Lightbulb } from 'lucide-react';
 import './CreatePostPage.css';
 
 export const CreatePostPage: React.FC = () => {
@@ -148,11 +149,35 @@ export const CreatePostPage: React.FC = () => {
     );
   }
 
+  const previewPost: Post = {
+    id: 'preview-post',
+    userId: 'current-user',
+    title: title.trim() || (type === PostType.LOST ? 'Lost Silver MacBook Air' : 'Found Blue Hydroflask Bottle'),
+    description: description.trim() || 'A detailed description with identifying marks, brand names, or serial numbers will appear here.',
+    category: category.trim() || 'General',
+    type,
+    status: PostStatus.ACTIVE,
+    location: location.trim() || (type === PostType.LOST ? 'Last seen location' : 'Found location'),
+    pictureUrl: pictureUrl || '',
+    currentCustody: type === PostType.FOUND ? (custodyType === 'self' ? CurrentCustody.SELF : CurrentCustody.CUSTODY) : null,
+    custodyLocation: type === PostType.FOUND && custodyType !== 'self' ? custodyLocation : undefined,
+    contactValue: type === PostType.FOUND && custodyType === 'self' ? contactDetails : undefined,
+    lostAt: type === PostType.LOST ? (lostOrFoundAt ? new Date(lostOrFoundAt).toISOString() : new Date().toISOString()) : undefined,
+    foundAt: type === PostType.FOUND ? (lostOrFoundAt ? new Date(lostOrFoundAt).toISOString() : new Date().toISOString()) : undefined,
+    createdAt: new Date().toISOString(),
+  };
+
   return (
     <div className="create-post-page">
-      <h1 className="page-heading">Report an Item</h1>
+      <header className="create-post-header">
+        <h1 className="page-heading">Report an Item</h1>
+        <p className="page-subheading">
+          Publish a listing to our community board. Once submitted, we will search for matching reports automatically.
+        </p>
+      </header>
       
-      <form onSubmit={handleSubmit} className="create-post-form">
+      <div className="create-post-layout">
+        <form onSubmit={handleSubmit} className="create-post-form">
         {error && <div className="form-error-banner">{error}</div>}
         
         {/* Type Selection */}
@@ -380,13 +405,50 @@ export const CreatePostPage: React.FC = () => {
         </div>
       </form>
 
-      {/* Matching Found Items Modal */}
-      <MatchingModal
-        isOpen={isMatchingModalOpen}
-        matches={matchingFoundPosts}
-        onDismiss={handleDismissMatches}
-        onViewMatch={handleViewMatch}
-      />
+      <aside className="create-post-sidebar">
+        <div className="preview-sticky-box">
+          <div className="preview-label-bar">
+            <span className="preview-tag">
+              <Eye size={14} /> Live Feed Preview
+            </span>
+            <span className="preview-subtag">Updates in real time</span>
+          </div>
+
+          <div className="preview-card-wrapper">
+            <PostCard post={previewPost} />
+          </div>
+
+          <div className="posting-tips-card">
+            <div className="tips-header">
+              <Lightbulb size={18} className="tips-bulb-icon" />
+              <h3 className="tips-title">Tips for Faster Reunion</h3>
+            </div>
+            <ul className="tips-list">
+              <li>
+                <strong>Be specific:</strong> Include unique marks, color shades, case types, or serial numbers.
+              </li>
+              <li>
+                <strong>Accurate location:</strong> Mention buildings, room numbers, or landmarks where it happened.
+              </li>
+              <li>
+                <strong>Clear photo:</strong> Posts with clear photos receive 3x more confirmed matches.
+              </li>
+              <li>
+                <strong>Automatic matching:</strong> When reporting lost, we instantly check existing found items in our database.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </aside>
     </div>
+
+    {/* Matching Found Items Modal */}
+    <MatchingModal
+      isOpen={isMatchingModalOpen}
+      matches={matchingFoundPosts}
+      onDismiss={handleDismissMatches}
+      onViewMatch={handleViewMatch}
+    />
+  </div>
   );
 };

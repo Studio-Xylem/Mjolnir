@@ -3,12 +3,19 @@ import { NavLink, Link } from 'react-router-dom';
 import { Search, PlusCircle, User, Menu, X, LogIn, LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { AuthModal } from '../AuthModal/AuthModal';
+import { ConfirmDialog } from '../ConfirmDialog/ConfirmDialog';
 import './Header.css';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isSignOutDialogOpen, setIsSignOutDialogOpen] = useState(false);
   const { user, isAuthenticated, signOut } = useAuth();
+
+  const handleConfirmSignOut = () => {
+    signOut();
+    setIsSignOutDialogOpen(false);
+  };
 
   return (
     <>
@@ -42,13 +49,21 @@ export function Header() {
 
             <div className="header-auth-section">
               {isAuthenticated ? (
-                <div className="user-profile-badge">
-                  <span className="user-avatar">{user?.username?.[0]?.toUpperCase() || 'U'}</span>
-                  <span className="user-name">{user?.username || 'User'}</span>
-                  <button className="btn-signout" onClick={signOut} title="Sign Out">
-                    <LogOut size={16} />
+                <>
+                  <div className="user-profile-badge">
+                    <span className="user-avatar">{user?.username?.[0]?.toUpperCase() || 'U'}</span>
+                    <span className="user-name">{user?.username || 'User'}</span>
+                  </div>
+                  <button 
+                    className="btn-signout" 
+                    onClick={() => setIsSignOutDialogOpen(true)} 
+                    title="Sign Out"
+                    aria-label="Sign Out"
+                  >
+                    <LogOut size={15} />
+                    <span className="btn-signout-label">Sign Out</span>
                   </button>
-                </div>
+                </>
               ) : (
                 <button className="btn-signin" onClick={() => setIsAuthModalOpen(true)}>
                   <LogIn size={16} /> Sign In
@@ -60,6 +75,16 @@ export function Header() {
       </header>
 
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+
+      <ConfirmDialog
+        open={isSignOutDialogOpen}
+        title="Sign Out"
+        description="Are you sure you want to sign out of your account?"
+        confirmLabel="Sign Out"
+        variant="danger"
+        onConfirm={handleConfirmSignOut}
+        onCancel={() => setIsSignOutDialogOpen(false)}
+      />
     </>
   );
 }
